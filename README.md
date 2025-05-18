@@ -399,38 +399,29 @@ Detailed impact calculations, including monetized benefits, are available for ea
 │   │   ├── policies/            # Program policies and procedures
 │   │   └── assets/              # Program-specific images and resources
 │   │
+│   ├── resume-generator/        # Resume and Cover Letter Generator files
+│   │   ├── README.md            # Program overview
+│   │   ├── technical-specs.md   # AI architecture and implementation details
+│   │   ├── impact-analysis.md   # Employment outcomes and efficiency metrics
+│   │   ├── user-guide.md        # Instructions for participants
+│   │   └── assets/              # Program-specific resources
+│   │
+│   ├── falcon-security/         # FALCON Security System files
+│   │   ├── README.md            # Program overview
+│   │   ├── technical-specs.md   # AI model specifications and implementation
+│   │   ├── privacy-framework.md # Guidelines for ethical surveillance
+│   │   ├── impact-analysis.md   # Security outcomes and cost savings
+│   │   └── assets/              # Program-specific resources
+│   │
+│   ├── insightful-mind/         # Insightful Mind Career Course files
+│   │   ├── README.md            # Program overview
+│   │   ├── day1-materials.md    # Day 1 class session curriculum
+│   │   ├── assessment-platform.md # Assessment system specifications
+│   │   ├── ai-report-framework.md # Personalized insight methodology
+│   │   ├── employment-pathways.md # Career readiness integration
+│   │   └── assets/              # Program-specific resources
+│   │
 │   └── future-programs/         # Placeholder for additional program development
-│
-├── impact/                      # Consolidated impact analysis
-│   ├── README.md                # Impact overview
-│   ├── economic-impact.md       # Financial ROI analysis
-│   ├── social-impact.md         # Community and individual benefits
-│   ├── visualizations/          # Data visualizations and charts
-│   └── case-studies/            # Individual success stories
-│
-├── funding/                     # Funding resources and templates
-│   ├── README.md                # Funding strategy overview
-│   ├── grant-templates/         # Customizable grant application templates
-│   ├── corporate-partnerships/  # Corporate engagement strategies
-│   ├── foundation-approach/     # Foundation relationship development
-│   └── sustainability-models/   # Long-term funding frameworks
-│
-├── implementation/              # Implementation resources
-│   ├── README.md                # Implementation overview
-│   ├── timelines/               # Project management timelines
-│   ├── staffing/                # Staffing requirements and job descriptions
-│   ├── training/                # Staff and volunteer training materials
-│   └── evaluation/              # Program evaluation frameworks
-│
-├── assets/                      # Repository media and resources
-│   ├── images/                  # Images and graphics
-│   ├── presentations/           # Slide decks and presentation materials
-│   └── videos/                  # Video resources
-│
-└── website/                     # TypeScript code for GitHub Pages
-    ├── src/                     # Source code for interactive elements
-    └── public/                  # Static assets
-```
 
 ---
 
