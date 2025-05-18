@@ -375,7 +375,7 @@ Detailed impact calculations, including monetized benefits, are available for ea
 
 ## Repository Structure
 
-```
+
 ├── README.md                    # This overview document
 │
 ├── programs/                    # Detailed program documentation
@@ -424,3 +424,181 @@ Detailed impact calculations, including monetized benefits, are available for ea
 │   └── future-programs/         # Placeholder for additional program development
 
 ---
+
+## Implementation Resources
+
+This repository contains comprehensive implementation resources for each program, including:
+
+### Project Management Tools
+- Detailed implementation timelines with milestones and dependencies
+- Task assignment frameworks and responsibility matrices
+- Risk management protocols and mitigation strategies
+- Quality assurance frameworks and success criteria
+
+### Staffing Resources
+- Job descriptions for all required positions
+- Qualification requirements and hiring guides
+- Training curriculum for staff and volunteers
+- Performance evaluation frameworks
+
+### Operational Materials
+- Standard operating procedures
+- Policy documentation
+- Participant agreements
+- Data collection protocols
+- Evaluation frameworks
+
+### Technical Documentation
+- System architecture diagrams
+- Equipment specifications
+- Integration requirements
+- Maintenance protocols
+- Support frameworks
+
+[View Implementation Resources](implementation/README.md)
+
+---
+
+## Funding Framework
+
+Each program includes a comprehensive funding framework designed to ensure long-term sustainability through diversified revenue streams and measurable returns on investment.
+
+### Multi-Source Matrix Approach
+- **Primary Funding**: Major grants and foundation support for implementation
+- **Secondary Funding**: Complementary grants covering specific components
+- **Operational Support**: Ongoing funding for staffing and day-to-day operations
+- **Participant Contributions**: Structured payment systems that balance affordability with ownership
+- **Community Support**: Faith community, individual donors, and local businesses
+- **Cost Offsets**: Quantifiable savings from operational efficiencies
+
+### Grant Application Resources
+- Templates for government, foundation, and corporate funding
+- Customizable narratives aligned with different funder priorities
+- Budget frameworks with detailed justifications
+- Evaluation plans matching funder expectations
+- Supporting documentation packages
+
+### Partnership Development
+- Corporate engagement strategies
+- Faith community mobilization approaches
+- Public sector partnership frameworks
+- In-kind contribution structures
+- Volunteer resource development
+
+[View Funding Resources](funding/README.md)
+
+---
+
+## Resource Directory
+
+This section provides a centralized directory of all program documentation, technical specifications, and data visualizations contained within this repository. Each link is organized by program area for easy reference.
+
+### Program Documentation
+
+#### Trinity Trikes
+- [Complete Trinity Trikes Program Documentation](programs/trinity-trikes/README.md) - Comprehensive overview of the weather-protected transportation program
+- [Trinity Trikes Implementation Guide](programs/trinity-trikes/implementation-plan.md) - Detailed phase-by-phase implementation timeline and steps
+- [Trinity Trikes Technical Specifications](programs/trinity-trikes/technical-specs.md) - Vehicle specifications, weather protection details, and maintenance requirements
+
+#### Call to Faith
+- [Complete Call to Faith Program Documentation](programs/call-to-faith/README.md) - Full description of the smartphone connectivity program
+- [Call to Faith Technical Infrastructure](programs/call-to-faith/technical-specs.md) - Cloud architecture, device management, and telecommunications integration details
+- [Digital Literacy Curriculum](programs/call-to-faith/training/digital-literacy.md) - Training materials for device operation and digital communication
+
+#### Resume and Cover Letter Generator
+- [Resume Generator Technical Documentation](programs/resume-generator/README.md) - Architecture and implementation details for the AI-powered document creation system
+- [Resume Generator User Guide](programs/resume-generator/user-guide.md) - Instructions for participants using the system
+
+#### FALCON Security System
+- [FALCON System Documentation](programs/falcon-security/README.md) - Complete overview of the AI-powered security monitoring system
+- [FALCON Technical Architecture](programs/falcon-security/technical-specs.md) - AI model specifications, integration requirements, and implementation details
+- [FALCON Privacy and Ethics Framework](programs/falcon-security/privacy-framework.md) - Guidelines ensuring resident dignity and appropriate use of monitoring technology
+
+#### Insightful Mind Career Course
+- [Insightful Mind Career Course Documentation](programs/insightful-mind/README.md) - Complete overview of the neuroscience-based career readiness program
+- [Day 1 Class Session Materials](programs/insightful-mind/day1-materials.md) - Curriculum for the foundational session on mental health and substance use
+- [Assessment Platform Technical Specifications](programs/insightful-mind/assessment-platform.md) - Details of the three-part assessment system (MBTI, clinical screeners, and life history profile)
+- [AI Report Generation Framework](programs/insightful-mind/ai-report-framework.md) - Methodology for creating personalized insight reports
+- [Employment Pathway Integration](programs/insightful-mind/employment-pathways.md) - How insights translate to career readiness and employment success
+
+### Data Visualizations and Interactive Tools
+
+#### Economic Impact Analysis
+- [Trinity Trikes Economic Impact Analysis](visualizations/trinity-trikes-impact.tsx) - Interactive visualization of cost savings, ROI, and community benefits
+- [Call to Faith Economic Impact Analysis](visualizations/call-to-faith-impact.tsx) - Data visualization showing employment outcomes and resource optimization
+- [Resume Generator Impact Analysis](visualizations/resume-generator-impact.tsx) - Metrics on employment success rates and operational efficiencies
+- [FALCON System ROI Analysis](visualizations/falcon-impact.tsx) - Security incident reduction and operational savings visualization
+- [Insightful Mind Career Course Impact Analysis](visualizations/insightful-mind-impact.tsx) - Visualization of employment readiness, self-understanding, and substance use reduction outcomes
+
+#### Interactive Interfaces
+- [Resume and Cover Letter Generator Interface](visualizations/resume-generator.tsx) - Interactive demonstration of the resume creation system
+- [Trinity Trikes Maintenance Training Module](visualizations/trinity-trikes-maintenance.tsx) - Interactive training visualization for basic maintenance procedures
+- [FALCON Security Dashboard Demo](visualizations/falcon-dashboard.tsx) - Example interface showing security monitoring capabilities
+- [Insightful Mind Assessment System](visualizations/insightful-mind-assessment.tsx) - Interactive demonstration of the three-part assessment process and personalized reporting
+- [Substance-Neurotransmitter Interactive Model](visualizations/neurotransmitter-model.tsx) - Visual exploration of how substances affect brain chemistry and mental health symptoms
+
+### Implementation Resources
+- [Staff Training Materials](implementation/training/README.md) - Curriculum for staff implementing all programs
+- [Evaluation Frameworks](implementation/evaluation/README.md) - Metrics and methods for measuring program success
+- [Project Management Tools](implementation/timelines/README.md) - Implementation timelines and management resources
+
+### Funding Materials
+- [Grant Application Templates](funding/grant-templates/README.md) - Customizable templates for various funding sources
+- [Corporate Partnership Proposals](funding/corporate-partnerships/README.md) - Frameworks for engaging business support
+- [Sustainability Models](funding/sustainability-models/README.md) - Long-term financial planning tools
+
+---
+
+## Contributing
+
+This repository welcomes contributions from multiple stakeholders:
+
+### Churches United Staff
+- Program refinement suggestions
+- Implementation experience documentation
+- Success story contributions
+- Impact measurement data
+
+### Community Partners
+- Integration opportunity identification
+- Collaborative program enhancement
+- Resource contribution documentation
+- Joint funding approach development
+
+### Technical Volunteers
+- TypeScript visualization enhancements
+- Documentation improvements
+- User experience optimization
+- Data analysis contributions
+
+### Subject Matter Experts
+- Program design consultation
+- Best practice recommendations
+- Evaluation framework refinement
+- Implementation guidance
+
+To contribute, please review the detailed contribution guidelines and code of conduct before submitting pull requests or issues.
+
+[View Contribution Guidelines](CONTRIBUTING.md)
+
+---
+
+## Contact Information
+
+For questions, collaboration opportunities, or additional information about the programs documented in this repository, please contact:
+
+**Churches United for the Homeless**  
+1901 1st Ave N  
+Moorhead, MN 56560  
+Phone: 218-236-0372  
+Website: [Churches-United.org](https://www.churches-united.org/)
+
+**Project Lead & Repository Maintainer:**  
+Tim Spurlin  
+Email: Tim.Spurlin@SaphyreSolutions.com  
+GitHub Profile: [Tim-Spurlin](https://github.com/Tim-Spurlin)
+
+---
+
+*"Providing Safe Shelter, Stable Housing, Nutritious Food, and a Path Toward Healing"*  
+— Churches United for the Homeless
