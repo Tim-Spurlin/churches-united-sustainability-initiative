@@ -1,0 +1,3 @@
+# Insightful Mind
+
+Program overview.
