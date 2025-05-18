@@ -51,15 +51,15 @@ Each initiative has been designed with these four pillars in mind, with particul
 This repository serves multiple critical functions:
 
 1. **Program Documentation Center**: Comprehensive documentation of each program's design, implementation approach, and operational requirements
-   
+
 2. **Impact Demonstration Tool**: Detailed analyses showing multi-dimensional benefits to participants, Churches United, taxpayers, and the broader community
-   
+
 3. **Funding Resource Hub**: Templates, frameworks, and resources for grant applications, corporate partnerships, and diversified funding approaches
-   
+
 4. **Implementation Guide**: Step-by-step implementation plans for each program, including technical specifications, staffing requirements, and operational procedures
-   
+
 5. **Data Visualization Platform**: Interactive visualizations demonstrating program impacts, cost savings, and return on investment
-   
+
 6. **Partnership Cultivation Resource**: Materials for approaching potential implementation partners, funders, and community stakeholders
 
 The repository is structured to serve multiple stakeholders, including Churches United leadership, potential funders, community partners, and implementation teams.
@@ -245,7 +245,7 @@ Churches United is implementing the Insightful Mind Career Course—an innovativ
 The course begins with a comprehensive foundation-building session that includes:
 
 - **Mental Health in Vulnerable Populations**: In-depth exploration of frequently overlooked conditions in homeless populations including Autism Spectrum Disorder, ADHD, Bipolar Disorder, Borderline Personality Disorder, Schizophrenia, and Compulsive Sexual Behavior Disorder
-  
+
 - **The Self-Medication Hypothesis**: Evidence-based discussion of how untreated symptoms (internal restlessness of ADHD, emotional pain of BPD, anxiety of ASD, mood fluctuations of Bipolar Disorder, distressing experiences of Schizophrenia) often lead to substance use as an unconscious attempt to manage symptoms
 
 - **Neurochemical Deep Dive**: Systematic analysis of neurotransmitter systems affected in each condition:
@@ -375,7 +375,7 @@ Detailed impact calculations, including monetized benefits, are available for ea
 
 ## Repository Structure
 
-
+```
 ├── README.md                    # This overview document
 │
 ├── programs/                    # Detailed program documentation
@@ -423,6 +423,7 @@ Detailed impact calculations, including monetized benefits, are available for ea
 │   │
 │   └── future-programs/         # Placeholder for additional program development
 
+```
 ---
 
 ## Implementation Resources
