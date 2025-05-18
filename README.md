@@ -114,7 +114,7 @@ The medical literature clearly establishes that prolonged cold exposure compromi
 
 [View Complete Trinity Trikes Documentation](programs/trinity-trikes/README.md)
 
-[View Trinity Trikes Economic Impact Analysis](visualizations/trinity-trikes-impact.tsx)
+[View Trinity Trikes Economic Impact Analysis](visualizations/impact-analysis.md)
 
 ### Call to Faith
 
