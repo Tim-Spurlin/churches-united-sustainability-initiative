@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import ImpactAnalysis from './components/impact-analysis';
+import ImpactAnalysis from './components/TrinityTrikesImpact';
 
 function App() {
   return (
