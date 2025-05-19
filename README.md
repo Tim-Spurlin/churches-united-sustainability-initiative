@@ -114,7 +114,7 @@ The medical literature clearly establishes that prolonged cold exposure compromi
 
 [View Complete Trinity Trikes Documentation](programs/trinity-trikes/README.md)
 
-[View Trinity Trikes Economic Impact Analysis](visualizations/impact-analysis.tsx)
+[View Trinity Trikes Economic Impact Analysis](https://tim-spurlin.github.io/churches-united-sustainability-initiative/visualizations/impact-analysis.tsx)
 
 ### Call to Faith
 
@@ -525,7 +525,7 @@ This section provides a centralized directory of all program documentation, tech
 ### Data Visualizations and Interactive Tools
 
 #### Economic Impact Analysis
-- [Trinity Trikes Economic Impact Analysis](visualizations/trinity-trikes-impact.tsx) - Interactive visualization of cost savings, ROI, and community benefits
+- [Trinity Trikes Economic Impact Analysis](https://tim-spurlin.github.io/churches-united-sustainability-initiative/visualizations/impact-analysis.tsx) - Interactive visualization of cost savings, ROI, and community benefits
 - [Call to Faith Economic Impact Analysis](visualizations/call-to-faith-impact.tsx) - Data visualization showing employment outcomes and resource optimization
 - [Resume Generator Impact Analysis](visualizations/resume-generator-impact.tsx) - Metrics on employment success rates and operational efficiencies
 - [FALCON System ROI Analysis](visualizations/falcon-impact.tsx) - Security incident reduction and operational savings visualization
