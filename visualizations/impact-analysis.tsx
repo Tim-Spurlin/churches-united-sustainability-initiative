@@ -1,1124 +1,981 @@
-import React, { useState } from 'react';
-import { 
-  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, 
-  Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell,
-  RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
-  AreaChart, Area, ComposedChart, Scatter
-} from 'recharts';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trinity Trikes Impact Analysis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-// Types for our data structures
-type BenefitCategory = {
-  name: string;
-  value: number;
-  description: string;
-  items: BenefitItem[];
-};
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background-color: #f9fafb;
+            color: #374151;
+            line-height: 1.6;
+        }
 
-type BenefitItem = {
-  name: string;
-  value: number;
-  description: string;
-};
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
 
-type FinancialData = {
-  category: string;
-  year1: number;
-  year2: number;
-  year3: number;
-  year4: number;
-  year5: number;
-  description: string;
-};
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
 
-type CostData = {
-  category: string;
-  value: number;
-  description: string;
-};
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
 
-type MetricData = {
-  name: string;
-  baseline: number;
-  projected: number;
-  actual?: number;
-  description: string;
-};
+        .header p {
+            font-size: 1.125rem;
+            color: #6b7280;
+        }
 
-type TimelineItem = {
-  phase: string;
-  months: string;
-  activities: string[];
-  milestones: string[];
-};
+        .nav-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
 
-// Trinity Trikes Impact Data
-const benefitCategories: BenefitCategory[] = [
-  {
-    name: "Economic Empowerment",
-    value: 85,
-    description: "Financial and employment benefits for participants",
-    items: [
-      { 
-        name: "Employment Access", 
-        value: 214, 
-        description: "Expands job search radius by 9.7 miles on average, increasing available job opportunities by 214%" 
-      },
-      { 
-        name: "Shift Work Access", 
-        value: 42, 
-        description: "Provides transportation during early morning/late night hours when public transit is unavailable (42% of entry-level positions require non-standard hours)" 
-      },
-      { 
-        name: "Monthly Savings", 
-        value: 150, 
-        description: "Saves residents $112-187 monthly in transportation costs compared to transit passes or rideshare services" 
-      },
-      { 
-        name: "Financial History", 
-        value: 65, 
-        description: "Structured lease payments help establish payment history and financial management skills" 
-      },
-      { 
-        name: "Asset Building", 
-        value: 80, 
-        description: "Progressive ownership model transforms monthly payments into equity" 
-      }
-    ]
-  },
-  {
-    name: "Dignity & Independence",
-    value: 90,
-    description: "Enhanced autonomy and self-perception benefits",
-    items: [
-      { 
-        name: "Schedule Freedom", 
-        value: 95, 
-        description: "Eliminates dependency on others for transportation timing and scheduling" 
-      },
-      { 
-        name: "Geographic Access", 
-        value: 85, 
-        description: "Removes artificial boundaries created by transit routes and service hours" 
-      },
-      { 
-        name: "Weather Resilience", 
-        value: 90, 
-        description: "Provides reliable transportation regardless of Minnesota weather conditions" 
-      },
-      { 
-        name: "Health Benefits", 
-        value: 75, 
-        description: "Combines physical activity with practical transportation" 
-      },
-      { 
-        name: "Technical Skills", 
-        value: 80, 
-        description: "Creates technical expertise through maintenance and repair training" 
-      },
-      { 
-        name: "Identity Enhancement", 
-        value: 85, 
-        description: "Shifts perception from 'homeless person' to 'trike owner/operator'" 
-      }
-    ]
-  },
-  {
-    name: "Barrier Elimination",
-    value: 85,
-    description: "Removing obstacles to employment and services",
-    items: [
-      { 
-        name: "Interview Access", 
-        value: 95, 
-        description: "Ensures reliable transportation to job interviews regardless of location or time" 
-      },
-      { 
-        name: "Appointment Access", 
-        value: 90, 
-        description: "Facilitates attendance at healthcare, social service, and government appointments" 
-      },
-      { 
-        name: "Beyond Downtown", 
-        value: 85, 
-        description: "Enables access to services and opportunities beyond downtown core" 
-      },
-      { 
-        name: "Time Saving", 
-        value: 64, 
-        description: "Decreases transportation time by 64% compared to public transit for identical journeys" 
-      },
-      { 
-        name: "Reliability", 
-        value: 95, 
-        description: "Eliminates dependence on transit schedules, reducing anxiety and uncertainty" 
-      },
-      { 
-        name: "Multi-Stop Efficiency", 
-        value: 80, 
-        description: "Enables efficient completion of multiple errands/appointments in single journeys" 
-      }
-    ]
-  },
-  {
-    name: "Organizational Benefits",
-    value: 80,
-    description: "Operational and mission improvements for Churches United",
-    items: [
-      { 
-        name: "Staff Time Savings", 
-        value: 23.4, 
-        description: "Eliminates 23.4 weekly staff hours currently dedicated to transportation assistance, valued at $30,420 annually" 
-      },
-      { 
-        name: "Direct Cost Reduction", 
-        value: 27300, 
-        description: "Decreases direct transportation expenditures by $27,300 annually (fuel, vehicle maintenance, transit passes)" 
-      },
-      { 
-        name: "Case Management Focus", 
-        value: 75, 
-        description: "Redirects staff focus from transportation logistics to employment and housing stability support" 
-      },
-      { 
-        name: "Appointment Adherence", 
-        value: 37, 
-        description: "Increases appointment attendance rates by estimated 37%, improving service efficiency" 
-      },
-      { 
-        name: "Crisis Reduction", 
-        value: 78, 
-        description: "Decreases emergency transportation requests by 78% based on pilot program data" 
-      }
-    ]
-  },
-  {
-    name: "Community Benefits",
-    value: 75,
-    description: "Improvements for the broader community",
-    items: [
-      { 
-        name: "Employment Reliability", 
-        value: 85, 
-        description: "Provides reliable employees for businesses struggling with worker attendance" 
-      },
-      { 
-        name: "Employer Cost Savings", 
-        value: 3200, 
-        description: "Decreases costs associated with turnover, tardiness, and absenteeism (estimated $3,200 annually per entry-level position)" 
-      },
-      { 
-        name: "Local Business Support", 
-        value: 27000, 
-        description: "Creates maintenance supply purchasing from local businesses, estimated at $27,000 annually" 
-      },
-      { 
-        name: "CO₂ Reduction", 
-        value: 18.7, 
-        description: "Eliminates 18.7 metric tons of CO₂ annually through car trip replacement" 
-      },
-      { 
-        name: "Vehicle Miles Reduced", 
-        value: 68400, 
-        description: "Reduces 68,400 vehicle miles annually within Moorhead city limits" 
-      }
-    ]
-  },
-  {
-    name: "Taxpayer Benefits",
-    value: 65,
-    description: "Public cost reductions and social improvements",
-    items: [
-      { 
-        name: "Emergency Services", 
-        value: 43900, 
-        description: "Reduces emergency room visits by 23% through improved preventative care access, saving $43,900 annually" 
-      },
-      { 
-        name: "Law Enforcement", 
-        value: 17600, 
-        description: "Decreases police contacts related to loitering and transportation issues by 38%, saving $17,600 annually" 
-      },
-      { 
-        name: "Medical Transport", 
-        value: 6800, 
-        description: "Reduces non-emergency medical transports by 16%, saving $6,800 annually" 
-      },
-      { 
-        name: "Transit Subsidy", 
-        value: 16400, 
-        description: "Reduces high-cost, low-ridership route dependency, saving $16,400 annually in public subsidies" 
-      },
-      { 
-        name: "Shelter Duration", 
-        value: 25600, 
-        description: "Decreases average length of stay by 16 days through faster employment acquisition, saving $25,600 annually" 
-      },
-      { 
-        name: "Public Assistance", 
-        value: 32400, 
-        description: "Decreases cash assistance need through sustainable employment, saving $32,400 annually" 
-      }
-    ]
-  }
-];
+        .nav-tab {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            background-color: #e5e7eb;
+            color: #374151;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
 
-const financialData: FinancialData[] = [
-  {
-    category: "External Funding",
-    year1: 68500,
-    year2: 57000,
-    year3: 45600,
-    year4: 34200,
-    year5: 28500,
-    description: "Grants, faith community support, and corporate contributions"
-  },
-  {
-    category: "Direct Revenue",
-    year1: 41500,
-    year2: 51900,
-    year3: 62300,
-    year4: 72500,
-    year5: 85700,
-    description: "Participant payments, maintenance services, and program fees"
-  },
-  {
-    category: "Churches United Investment",
-    year1: 10000,
-    year2: 10000,
-    year3: 10000,
-    year4: 10000,
-    year5: 5000,
-    description: "Organizational commitment to program sustainability"
-  }
-];
+        .nav-tab.active {
+            background-color: #2563eb;
+            color: white;
+        }
 
-const costData: CostData[] = [
-  { category: "Fleet Acquisition", value: 30000, description: "25 trikes @ $1,200 each" },
-  { category: "Weather Protection", value: 8750, description: "25 units @ $350 each" },
-  { category: "Security Integration", value: 3000, description: "25 units @ $120 each" },
-  { category: "Workshop Equipment", value: 7500, description: "Tools, stands, and equipment" },
-  { category: "Storage Infrastructure", value: 4500, description: "Secure storage system" },
-  { category: "Maintenance Supplies", value: 3000, description: "Initial parts inventory" }
-];
+        .nav-tab:hover {
+            background-color: #d1d5db;
+        }
 
-const annualCostData: CostData[] = [
-  { category: "Program Coordination", value: 26000, description: "Part-time coordinator (20 hrs/week)" },
-  { category: "Maintenance Supplies", value: 9000, description: "Ongoing parts and materials" },
-  { category: "Workshop Supplies", value: 3600, description: "Consumable shop supplies" },
-  { category: "Replacement Reserve", value: 7500, description: "Component replacement fund" },
-  { category: "Training Materials", value: 2400, description: "Educational resources" },
-  { category: "Insurance and Liability", value: 3800, description: "Specialized program coverage" }
-];
+        .nav-tab.active:hover {
+            background-color: #1d4ed8;
+        }
 
-const costSavingData: CostData[] = [
-  { category: "Staff Redirection", value: 30420, description: "23.4 weekly hours @ $25/hour" },
-  { category: "Transportation Reduction", value: 27300, description: "Direct costs avoided" },
-  { category: "Service Duration", value: 48000, description: "Faster transition to independence" },
-  { category: "Emergency Intervention", value: 16400, description: "Crisis management avoidance" }
-];
+        .grid {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
 
-const employmentMetrics: MetricData[] = [
-  { name: "Employment Placement", baseline: 37, projected: 63, actual: 59, description: "Percentage of residents securing employment" },
-  { name: "Job Retention (90 days)", baseline: 42, projected: 75, actual: 70, description: "Percentage maintaining employment at 90 days" },
-  { name: "Interview Access", baseline: 45, projected: 95, actual: 90, description: "Percentage able to attend interviews" },
-  { name: "Work Arrival", baseline: 68, projected: 92, actual: 89, description: "Percentage of on-time arrivals to work" },
-  { name: "Job Search Radius", baseline: 3.5, projected: 9.7, actual: 8.9, description: "Average miles from shelter for job search" }
-];
+        .card {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+        }
 
-const implementationTimeline: TimelineItem[] = [
-  {
-    phase: "Phase 1: Planning and Infrastructure",
-    months: "Months 1-3",
-    activities: [
-      "Workshop space development within community center",
-      "Tool and equipment acquisition",
-      "Initial trike specification and procurement",
-      "Security system development",
-      "Program documentation creation",
-      "Staff and volunteer training"
-    ],
-    milestones: [
-      "Workshop space fully equipped",
-      "Initial fleet of 10 trikes acquired",
-      "Program handbook and application process completed",
-      "Security protocols established"
-    ]
-  },
-  {
-    phase: "Phase 2: Pilot Implementation",
-    months: "Months 4-7",
-    activities: [
-      "Participant selection and onboarding",
-      "Equipment deployment to initial participants",
-      "Support system implementation",
-      "Weather modification development and testing",
-      "Data collection system activation",
-      "Initial employment outcome tracking"
-    ],
-    milestones: [
-      "10 participants successfully onboarded",
-      "First cohort completes basic maintenance training",
-      "Weather protection system prototypes tested",
-      "Initial employment outcomes documented"
-    ]
-  },
-  {
-    phase: "Phase 3: Program Expansion",
-    months: "Months 8-16",
-    activities: [
-      "Fleet expansion based on pilot phase feedback",
-      "Participant expansion to 25 total",
-      "Workshop capacity enhancement",
-      "Financial sustainability development",
-      "Community integration enhancement",
-      "Comprehensive impact evaluation"
-    ],
-    milestones: [
-      "25 total participants engaged",
-      "Maintenance program fully implemented",
-      "Community service component launched",
-      "Additional funding sources secured"
-    ]
-  },
-  {
-    phase: "Phase 4: Self-Sustaining Model",
-    months: "Months 17-24",
-    activities: [
-      "Cooperative structure development",
-      "Social enterprise component implementation",
-      "Job training certification development",
-      "Community network integration",
-      "Expansion planning",
-      "Long-term sustainability modeling"
-    ],
-    milestones: [
-      "Participant leadership structure established",
-      "Revenue-generating services launched",
-      "Formal certification program recognized",
-      "Long-term funding strategy implemented"
-    ]
-  }
-];
+        .card h2 {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #1f2937;
+        }
 
-const fiscalSustainability = [
-  { name: 'Year 1', external: 60, direct: 20, churchesUnited: 20 },
-  { name: 'Year 2', external: 50, direct: 30, churchesUnited: 20 },
-  { name: 'Year 3', external: 40, direct: 40, churchesUnited: 20 },
-  { name: 'Year 4', external: 30, direct: 50, churchesUnited: 20 },
-  { name: 'Year 5', external: 25, direct: 65, churchesUnited: 10 },
-];
+        .chart-container {
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 1rem 0;
+        }
 
-const taxPayerSavings = [
-  { name: 'Emergency Services', value: 43900 },
-  { name: 'Law Enforcement', value: 17600 },
-  { name: 'Medical Transport', value: 6800 },
-  { name: 'Transit Subsidy', value: 16400 },
-  { name: 'Shelter Duration', value: 25600 },
-  { name: 'Public Assistance', value: 32400 },
-];
+        .bar-chart {
+            width: 100%;
+            height: 250px;
+            position: relative;
+        }
 
-const totalSavings = taxPayerSavings.reduce((acc, item) => acc + item.value, 0);
+        .bar {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
 
-// Custom tooltip components for better data presentation
-const CustomTooltip = ({ active, payload, label }: any) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="bg-white p-4 border rounded shadow-md text-sm max-w-xs">
-        <p className="font-bold text-gray-700">{`${label}`}</p>
-        {payload.map((entry: any, index: number) => (
-          <p key={`item-${index}`} className="text-sm" style={{ color: entry.color }}>
-            {`${entry.name}: ${entry.value.toLocaleString()} ${entry.unit || ''}`}
-          </p>
-        ))}
-        {payload[0].payload.description && (
-          <p className="text-xs text-gray-600 mt-1">{payload[0].payload.description}</p>
-        )}
-      </div>
-    );
-  }
-  return null;
-};
+        .bar:hover {
+            opacity: 0.8;
+        }
 
-const BenefitTooltip = ({ active, payload }: any) => {
-  if (active && payload && payload.length) {
-    const data = payload[0].payload;
-    return (
-      <div className="bg-white p-4 border rounded shadow-md text-sm max-w-xs">
-        <p className="font-bold text-gray-700">{data.name}</p>
-        <p className="text-sm text-gray-600">{`Value: ${data.value}`}</p>
-        <p className="text-xs text-gray-600 mt-1">{data.description}</p>
-      </div>
-    );
-  }
-  return null;
-};
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
+        .metric-card {
+            text-align: center;
+            padding: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background: #f9fafb;
+        }
 
-// Main component
-const TrinityTrikesImpact = () => {
-  const [activeView, setActiveView] = useState<'overview' | 'financial' | 'benefits' | 'timeline' | 'metrics'>('overview');
-  const [activeBenefitCategory, setActiveBenefitCategory] = useState<string>("Economic Empowerment");
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #059669;
+        }
 
-  const selectedBenefitCategory = benefitCategories.find(cat => cat.name === activeBenefitCategory) || benefitCategories[0];
+        .metric-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
 
-  // Handler for filtering benefit categories
-  const handleBenefitCategoryChange = (category: string) => {
-    setActiveBenefitCategory(category);
-  };
+        .progress-bar {
+            width: 100%;
+            height: 1rem;
+            background-color: #e5e7eb;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
 
-  return (
-    <div className="flex flex-col bg-gray-50 p-6 h-full">
-      <h1 className="text-3xl font-bold text-gray-800 mb-2">Trinity Trikes Impact Analysis</h1>
-      <p className="text-gray-600 mb-6">Comprehensive visualization of program outcomes and projections</p>
-      
-      {/* Navigation tabs */}
-      <div className="flex space-x-2 mb-6">
-        <button 
-          className={`px-4 py-2 rounded-md ${activeView === 'overview' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
-          onClick={() => setActiveView('overview')}
-        >
-          Overview
-        </button>
-        <button 
-          className={`px-4 py-2 rounded-md ${activeView === 'benefits' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
-          onClick={() => setActiveView('benefits')}
-        >
-          Benefits Analysis
-        </button>
-        <button 
-          className={`px-4 py-2 rounded-md ${activeView === 'financial' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
-          onClick={() => setActiveView('financial')}
-        >
-          Financial Analysis
-        </button>
-        <button 
-          className={`px-4 py-2 rounded-md ${activeView === 'timeline' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
-          onClick={() => setActiveView('timeline')}
-        >
-          Implementation
-        </button>
-        <button 
-          className={`px-4 py-2 rounded-md ${activeView === 'metrics' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
-          onClick={() => setActiveView('metrics')}
-        >
-          Key Metrics
-        </button>
-      </div>
-      
-      {/* Overview View */}
-      {activeView === 'overview' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Program Impact Overview</h2>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <RadarChart outerRadius={90} data={benefitCategories}>
-                  <PolarGrid />
-                  <PolarAngleAxis dataKey="name" tick={{ fill: '#666', fontSize: 12 }} />
-                  <PolarRadiusAxis angle={90} domain={[0, 100]} />
-                  <Radar name="Impact Score" dataKey="value" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
-                  <Tooltip content={<BenefitTooltip />} />
-                </RadarChart>
-              </ResponsiveContainer>
-            </div>
-            <p className="text-sm text-gray-600 mt-2">
-              Multi-dimensional impact across six major benefit categories, showing relative strength in each area.
-            </p>
-          </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Cost-Benefit Analysis</h2>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={[
-                    {name: 'Initial Investment', value: costData.reduce((sum, item) => sum + item.value, 0)},
-                    {name: 'Annual Operating', value: annualCostData.reduce((sum, item) => sum + item.value, 0)},
-                    {name: 'Annual Savings', value: costSavingData.reduce((sum, item) => sum + item.value, 0)},
-                    {name: 'Taxpayer Savings', value: totalSavings}
-                  ]}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, 'Amount']} />
-                  <Bar dataKey="value" fill="#82ca9d" name="Amount ($)" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-            <p className="text-sm text-gray-600 mt-2">
-              Comparison of program investments versus direct financial benefits, showing strong ROI in 2.7 years.
-            </p>
-          </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Program Sustainability Trajectory</h2>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart
-                  data={fiscalSustainability}
-                  margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis tickFormatter={(value) => `${value}%`} />
-                  <Tooltip formatter={(value) => [`${value}%`, '']} />
-                  <Area type="monotone" dataKey="external" stackId="1" stroke="#8884d8" fill="#8884d8" name="External Funding" />
-                  <Area type="monotone" dataKey="direct" stackId="1" stroke="#82ca9d" fill="#82ca9d" name="Direct Revenue" />
-                  <Area type="monotone" dataKey="churchesUnited" stackId="1" stroke="#ffc658" fill="#ffc658" name="Churches United" />
-                  <Legend />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-            <p className="text-sm text-gray-600 mt-2">
-              Five-year funding model showing transition from external funding dependency to self-sustaining operation.
-            </p>
-          </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Employment Outcomes</h2>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={employmentMetrics}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Legend />
-                  <Bar dataKey="baseline" fill="#8884d8" name="Baseline %" />
-                  <Bar dataKey="projected" fill="#82ca9d" name="Projected %" />
-                  <Bar dataKey="actual" fill="#ffc658" name="Actual %" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-            <p className="text-sm text-gray-600 mt-2">
-              Comparison of baseline, projected, and actual employment-related outcomes showing significant improvements.
-            </p>
-          </div>
+        .progress-fill {
+            height: 100%;
+            background-color: #2563eb;
+            transition: width 0.5s ease;
+        }
+
+        .key-points {
+            background: #f3f4f6;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .key-points ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .key-points li {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .key-points li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #059669;
+            font-weight: bold;
+        }
+
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        .pie-chart {
+            width: 250px;
+            height: 250px;
+            margin: 0 auto;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .table th,
+        .table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .table th {
+            background-color: #f9fafb;
+            font-weight: 600;
+        }
+
+        .highlight-green {
+            color: #059669;
+            font-weight: 600;
+        }
+
+        .highlight-blue {
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Trinity Trikes Impact Analysis</h1>
+            <p>Comprehensive visualization of program outcomes and projections</p>
         </div>
-      )}
-      
-      {/* Benefits Analysis View */}
-      {activeView === 'benefits' && (
-        <div className="flex flex-col w-full">
-          <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Multi-Dimensional Benefits Analysis</h2>
-            
-            {/* Benefit category selector */}
-            <div className="flex flex-wrap gap-2 mb-4">
-              {benefitCategories.map(category => (
-                <button
-                  key={category.name}
-                  className={`px-3 py-1 rounded-full text-sm ${activeBenefitCategory === category.name 
-                    ? 'bg-blue-600 text-white' 
-                    : 'bg-gray-200 text-gray-700'}`}
-                  onClick={() => handleBenefitCategoryChange(category.name)}
-                >
-                  {category.name}
-                </button>
-              ))}
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="font-bold text-gray-700 mb-2">{selectedBenefitCategory.name}</h3>
-                <p className="text-gray-600 mb-4">{selectedBenefitCategory.description}</p>
-                <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={selectedBenefitCategory.items}
-                      margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                      layout="vertical"
-                    >
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis type="number" />
-                      <YAxis type="category" dataKey="name" width={100} />
-                      <Tooltip content={<CustomTooltip />} />
-                      <Bar dataKey="value" fill="#8884d8" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-              
-              <div className="border-l pl-6">
-                <h3 className="font-bold text-gray-700 mb-2">Detailed Benefits</h3>
-                <div className="space-y-3 max-h-64 overflow-y-auto pr-2">
-                  {selectedBenefitCategory.items.map((item, index) => (
-                    <div key={index} className="border-b pb-2">
-                      <div className="flex justify-between">
-                        <span className="font-semibold">{item.name}</span>
-                        <span className="text-blue-600 font-bold">{item.value}</span>
-                      </div>
-                      <p className="text-sm text-gray-600">{item.description}</p>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showView('overview')">Overview</button>
+            <button class="nav-tab" onclick="showView('financial')">Financial Analysis</button>
+            <button class="nav-tab" onclick="showView('metrics')">Key Metrics</button>
+            <button class="nav-tab" onclick="showView('implementation')">Implementation</button>
+        </div>
+
+        <!-- Overview Section -->
+        <div id="overview" class="view-section active">
+            <div class="grid">
+                <div class="card">
+                    <h2>Program Impact Categories</h2>
+                    <div class="chart-container">
+                        <svg class="bar-chart" viewBox="0 0 400 250">
+                            <g id="impact-bars"></g>
+                            <g id="impact-labels"></g>
+                        </svg>
                     </div>
-                  ))}
+                    <div class="key-points">
+                        <p><strong>Multi-dimensional impact across six major benefit categories:</strong></p>
+                        <ul>
+                            <li>Economic Empowerment: 85% impact score</li>
+                            <li>Dignity & Independence: 90% impact score</li>
+                            <li>Barrier Elimination: 85% impact score</li>
+                        </ul>
+                    </div>
                 </div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">Community & Organizational Impact</h2>
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={taxPayerSavings}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                      nameKey="name"
-                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                    >
-                      {taxPayerSavings.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, 'Annual Savings']} />
-                    <Legend layout="vertical" verticalAlign="bottom" align="right" />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="mt-3 text-center">
-                <p className="text-sm text-gray-600">Total Annual Taxpayer Savings</p>
-                <p className="text-xl font-bold text-green-600">${totalSavings.toLocaleString()}</p>
-              </div>
-            </div>
-            
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">Environmental Impact</h2>
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div className="border rounded-lg p-4 text-center">
-                  <p className="text-sm text-gray-600">CO₂ Reduction</p>
-                  <p className="text-xl font-bold text-green-600">18.7 tons</p>
-                  <p className="text-xs text-gray-500">annually</p>
-                </div>
-                <div className="border rounded-lg p-4 text-center">
-                  <p className="text-sm text-gray-600">Vehicle Miles Reduced</p>
-                  <p className="text-xl font-bold text-green-600">68,400</p>
-                  <p className="text-xs text-gray-500">annually</p>
-                </div>
-                <div className="border rounded-lg p-4 text-center">
-                  <p className="text-sm text-gray-600">Fossil Fuel Saved</p>
-                  <p className="text-xl font-bold text-green-600">2,850 gal</p>
-                  <p className="text-xs text-gray-500">annually</p>
-                </div>
-                <div className="border rounded-lg p-4 text-center">
-                  <p className="text-sm text-gray-600">Noise Reduction</p>
-                  <p className="text-xl font-bold text-green-600">Significant</p>
-                  <p className="text-xs text-gray-500">nearly silent operation</p>
-                </div>
-              </div>
-              <p className="text-sm text-gray-600">
-                Trinity Trikes provides substantial environmental benefits through emission-free transportation, 
-                reduced traffic congestion, and decreased fossil fuel consumption, while also serving as a visible 
-                model for practical sustainable transportation.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-      
-      {/* Financial Analysis View */}
-      {activeView === 'financial' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Implementation Costs</h2>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={costData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                    nameKey="category"
-                    label={({ name, percent }) => `${percent * 100}%`}
-                  >
-                    {costData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, 'Investment']} />
-                  <Legend layout="vertical" verticalAlign="bottom" align="center" />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="mt-2 text-center">
-              <p className="text-sm text-gray-600">Total Capital Investment</p>
-              <p className="text-xl font-bold text-blue-600">
-                ${costData.reduce((acc, item) => acc + item.value, 0).toLocaleString()}
-              </p>
-            </div>
-          </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Annual Operating Expenses</h2>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={annualCostData}
-                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="category" />
-                  <YAxis />
-                  <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, 'Annual Cost']} />
-                  <Bar dataKey="value" fill="#82ca9d" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="mt-2 text-center">
-              <p className="text-sm text-gray-600">Total Annual Operating Cost</p>
-              <p className="text-xl font-bold text-blue-600">
-                ${annualCostData.reduce((acc, item) => acc + item.value, 0).toLocaleString()}
-              </p>
-            </div>
-          </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Five-Year Funding Trajectory</h2>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart
-                  data={[
-                    { year: 'Year 1', total: financialData.reduce((acc, item) => acc + item.year1, 0) },
-                    { year: 'Year 2', total: financialData.reduce((acc, item) => acc + item.year2, 0) },
-                    { year: 'Year 3', total: financialData.reduce((acc, item) => acc + item.year3, 0) },
-                    { year: 'Year 4', total: financialData.reduce((acc, item) => acc + item.year4, 0) },
-                    { year: 'Year 5', total: financialData.reduce((acc, item) => acc + item.year5, 0) }
-                  ]}
-                  margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
-                >
-                  <CartesianGrid stroke="#f5f5f5" />
-                  <XAxis dataKey="year" />
-                  <YAxis />
-                  <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, 'Total Funding']} />
-                  <Bar dataKey="total" barSize={40} fill="#413ea0" />
-                  <Line type="monotone" dataKey="total" stroke="#ff7300" />
-                </ComposedChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Cost Savings & Value Creation</h2>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={costSavingData}
-                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                  layout="vertical"
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis type="number" />
-                  <YAxis type="category" dataKey="category" />
-                  <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, 'Annual Value']} />
-                  <Bar dataKey="value" fill="#ff7300" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="mt-2 text-center">
-              <p className="text-sm text-gray-600">Total Annual Value Creation</p>
-              <p className="text-xl font-bold text-green-600">
-                ${costSavingData.reduce((acc, item) => acc + item.value, 0).toLocaleString()}
-              </p>
-            </div>
-          </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow-md md:col-span-2">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Funding Source Breakdown by Year</h2>
-            <div className="h-72">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={[
-                    { name: 'Year 1', ...financialData.reduce((acc, item) => {
-                      acc[item.category] = item.year1;
-                      return acc;
-                    }, {}) },
-                    { name: 'Year 2', ...financialData.reduce((acc, item) => {
-                      acc[item.category] = item.year2;
-                      return acc;
-                    }, {}) },
-                    { name: 'Year 3', ...financialData.reduce((acc, item) => {
-                      acc[item.category] = item.year3;
-                      return acc;
-                    }, {}) },
-                    { name: 'Year 4', ...financialData.reduce((acc, item) => {
-                      acc[item.category] = item.year4;
-                      return acc;
-                    }, {}) },
-                    { name: 'Year 5', ...financialData.reduce((acc, item) => {
-                      acc[item.category] = item.year5;
-                      return acc;
-                    }, {}) }
-                  ]}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, '']} />
-                  <Legend />
-                  {financialData.map((item, index) => (
-                    <Bar key={item.category} dataKey={item.category} stackId="a" fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-      )}
-      
-      {/* Implementation Timeline View */}
-      {activeView === 'timeline' && (
-        <div className="bg-white p-6 rounded-lg shadow-md w-full">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Implementation Timeline</h2>
-          
-          {implementationTimeline.map((phase, index) => (
-            <div key={index} className="mb-8">
-              <div className="flex items-center mb-2">
-                <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center mr-3">
-                  {index + 1}
-                </div>
-                <h3 className="text-lg font-bold">{phase.phase}</h3>
-                <span className="ml-3 text-sm bg-gray-200 px-2 py-1 rounded">{phase.months}</span>
-              </div>
-              
-              <div className="ml-11 grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="font-bold text-gray-700 mb-2">Key Activities</h4>
-                  <ul className="list-disc pl-6 space-y-1">
-                    {phase.activities.map((activity, idx) => (
-                      <li key={idx} className="text-gray-600">{activity}</li>
-                    ))}
-                  </ul>
-                </div>
-                
-                <div>
-                  <h4 className="font-bold text-gray-700 mb-2">Milestones</h4>
-                  <ul className="list-disc pl-6 space-y-1">
-                    {phase.milestones.map((milestone, idx) => (
-                      <li key={idx} className="text-gray-600">{milestone}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-              
-              {index < implementationTimeline.length - 1 && (
-                <div className="w-0.5 h-8 bg-blue-600 ml-4 mt-2"></div>
-              )}
-            </div>
-          ))}
-          
-          <div className="mt-6 p-4 bg-gray-100 rounded-lg">
-            <h3 className="font-bold text-gray-800 mb-2">Implementation Highlights</h3>
-            <ul className="space-y-2">
-              <li className="flex items-start">
-                <span className="text-green-500 mr-2">✓</span>
-                <span>Phased approach ensures controlled growth and opportunity for refinement</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-green-500 mr-2">✓</span>
-                <span>Initial pilot with 10 participants allows for concept validation before full implementation</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-green-500 mr-2">✓</span>
-                <span>Progressive transition to self-sustaining model by month 24</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-green-500 mr-2">✓</span>
-                <span>Comprehensive data collection and evaluation at each phase to guide program refinement</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-green-500 mr-2">✓</span>
-                <span>Final phase establishes formal certification program and expands employment opportunities</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-      )}
-      
-      {/* Key Metrics View */}
-      {activeView === 'metrics' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Employment Outcomes</h2>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={employmentMetrics}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Legend />
-                  <Bar dataKey="baseline" fill="#8884d8" name="Baseline" />
-                  <Bar dataKey="projected" fill="#82ca9d" name="Projected" />
-                  <Bar dataKey="actual" fill="#ffc658" name="Actual" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="mt-2">
-              <h3 className="font-bold text-gray-700 mb-2">Key Improvements</h3>
-              <ul className="text-sm text-gray-600 space-y-1">
-                <li>• Employment placement increased from 37% to 59% (22 percentage points)</li>
-                <li>• 90-day job retention improved from 42% to 70% (28 percentage points)</li>
-                <li>• Interview access expanded from 45% to 90% (45 percentage points)</li>
-                <li>• Average job search radius expanded by 5.4 miles</li>
-              </ul>
-            </div>
-          </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Taxpayer Cost Avoidance</h2>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={taxPayerSavings}
-                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, 'Annual Savings']} />
-                  <Bar dataKey="value" fill="#8884d8" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="mt-3 text-center">
-              <p className="text-sm text-gray-600">Total Annual Taxpayer Savings</p>
-              <p className="text-xl font-bold text-green-600">${totalSavings.toLocaleString()}</p>
-            </div>
-          </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Return on Investment</h2>
-            <div className="flex space-x-4 mb-4">
-              <div className="border rounded-lg p-4 text-center flex-1">
-                <p className="text-sm text-gray-600">Financial ROI Timeline</p>
-                <p className="text-2xl font-bold text-blue-600">2.7 years</p>
-                <p className="text-xs text-gray-500">Initial investment recovery</p>
-              </div>
-              <div className="border rounded-lg p-4 text-center flex-1">
-                <p className="text-sm text-gray-600">1-Year Value Creation</p>
-                <p className="text-2xl font-bold text-green-600">$264,820</p>
-                <p className="text-xs text-gray-500">Combined direct & indirect value</p>
-              </div>
-            </div>
-            <div className="h-48">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  data={[
-                    { year: 1, investment: -56750, revenue: 41500, savings: 122120, cumulative: 106870 },
-                    { year: 2, investment: -52300, revenue: 51900, savings: 122120, cumulative: 228590 },
-                    { year: 3, investment: -52300, revenue: 62300, savings: 122120, cumulative: 360710 },
-                    { year: 4, investment: -52300, revenue: 72500, savings: 122120, cumulative: 503030 },
-                    { year: 5, investment: -52300, revenue: 85700, savings: 122120, cumulative: 658550 }
-                  ]}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="year" label={{ value: 'Year', position: 'insideBottom', offset: -5 }} />
-                  <YAxis />
-                  <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, '']} />
-                  <Legend />
-                  <Line type="monotone" dataKey="cumulative" stroke="#82ca9d" name="Cumulative Net Value" />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-            <p className="text-sm text-gray-600 mt-2">
-              Program generates positive value from first year of operation, with 5-year cumulative value of $658,550.
-            </p>
-          </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Key Performance Indicators</h2>
-            <div className="space-y-4">
-              <div>
-                <h3 className="font-bold text-gray-700">Transportation Reliability</h3>
-                <div className="flex items-center mt-1">
-                  <div className="w-full bg-gray-200 rounded-full h-2.5 mr-2">
-                    <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: '89%' }}></div>
-                  </div>
-                  <span className="text-sm font-medium">89%</span>
-                </div>
-                <p className="text-xs text-gray-500">On-time arrival to work shifts</p>
-              </div>
-              
-              <div>
-                <h3 className="font-bold text-gray-700">Weather Resilience</h3>
-                <div className="flex items-center mt-1">
-                  <div className="w-full bg-gray-200 rounded-full h-2.5 mr-2">
-                    <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: '92%' }}></div>
-                  </div>
-                  <span className="text-sm font-medium">92%</span>
-                </div>
-                <p className="text-xs text-gray-500">Successful trips despite adverse weather</p>
-              </div>
-              
-              <div>
-                <h3 className="font-bold text-gray-700">Maintenance Compliance</h3>
-                <div className="flex items-center mt-1">
-                  <div className="w-full bg-gray-200 rounded-full h-2.5 mr-2">
-                    <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: '78%' }}></div>
-                  </div>
-                  <span className="text-sm font-medium">78%</span>
-                </div>
-                <p className="text-xs text-gray-500">Participants performing required maintenance</p>
-              </div>
-              
-              <div>
-                <h3 className="font-bold text-gray-700">Payment Compliance</h3>
-                <div className="flex items-center mt-1">
-                  <div className="w-full bg-gray-200 rounded-full h-2.5 mr-2">
-                    <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: '85%' }}></div>
-                  </div>
-                  <span className="text-sm font-medium">85%</span>
-                </div>
-                <p className="text-xs text-gray-500">On-time lease payments</p>
-              </div>
-              
-              <div>
-                <h3 className="font-bold text-gray-700">Skill Development</h3>
-                <div className="flex items-center mt-1">
-                  <div className="w-full bg-gray-200 rounded-full h-2.5 mr-2">
-                    <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: '72%' }}></div>
-                  </div>
-                  <span className="text-sm font-medium">72%</span>
-                </div>
-                <p className="text-xs text-gray-500">Participants advancing to advanced certification</p>
-              </div>
-              
-              <div>
-                <h3 className="font-bold text-gray-700">Community Integration</h3>
-                <div className="flex items-center mt-1">
-                  <div className="w-full bg-gray-200 rounded-full h-2.5 mr-2">
-                    <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: '68%' }}></div>
-                  </div>
-                  <span className="text-sm font-medium">68%</span>
-                </div>
-                <p className="text-xs text-gray-500">Participation in community events</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
 
-export default TrinityTrikesImpact;
+                <div class="card">
+                    <h2>Cost-Benefit Analysis</h2>
+                    <div class="metric-grid">
+                        <div class="metric-card">
+                            <div class="metric-value">$56,750</div>
+                            <div class="metric-label">Initial Investment</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">$52,300</div>
+                            <div class="metric-label">Annual Operating</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">$122,120</div>
+                            <div class="metric-label">Annual Savings</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">$142,700</div>
+                            <div class="metric-label">Taxpayer Savings</div>
+                        </div>
+                    </div>
+                    <div class="key-points">
+                        <p><strong>Strong ROI with investment recovery in 2.7 years</strong></p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Employment Outcomes</h2>
+                    <div style="margin: 1rem 0;">
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>Employment Placement</span>
+                                <span><span class="highlight-blue">59%</span> (up from 37%)</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 59%;"></div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>Job Retention (90 days)</span>
+                                <span><span class="highlight-blue">70%</span> (up from 42%)</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 70%;"></div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>Interview Access</span>
+                                <span><span class="highlight-blue">90%</span> (up from 45%)</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 90%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Environmental Impact</h2>
+                    <div class="metric-grid">
+                        <div class="metric-card">
+                            <div class="metric-value">18.7 tons</div>
+                            <div class="metric-label">CO₂ Reduction (annual)</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">68,400</div>
+                            <div class="metric-label">Vehicle Miles Reduced</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">2,850 gal</div>
+                            <div class="metric-label">Fossil Fuel Saved</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">Significant</div>
+                            <div class="metric-label">Noise Reduction</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Financial Analysis Section -->
+        <div id="financial" class="view-section">
+            <div class="grid">
+                <div class="card">
+                    <h2>Implementation Costs Breakdown</h2>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Amount</th>
+                                <th>Percentage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Fleet Acquisition (25 trikes)</td>
+                                <td class="highlight-blue">$30,000</td>
+                                <td>52.9%</td>
+                            </tr>
+                            <tr>
+                                <td>Weather Protection Systems</td>
+                                <td class="highlight-blue">$8,750</td>
+                                <td>15.4%</td>
+                            </tr>
+                            <tr>
+                                <td>Workshop Equipment</td>
+                                <td class="highlight-blue">$7,500</td>
+                                <td>13.2%</td>
+                            </tr>
+                            <tr>
+                                <td>Storage Infrastructure</td>
+                                <td class="highlight-blue">$4,500</td>
+                                <td>7.9%</td>
+                            </tr>
+                            <tr>
+                                <td>Security Integration</td>
+                                <td class="highlight-blue">$3,000</td>
+                                <td>5.3%</td>
+                            </tr>
+                            <tr>
+                                <td>Maintenance Supplies</td>
+                                <td class="highlight-blue">$3,000</td>
+                                <td>5.3%</td>
+                            </tr>
+                            <tr style="font-weight: bold; background-color: #f9fafb;">
+                                <td>Total Capital Investment</td>
+                                <td class="highlight-blue">$56,750</td>
+                                <td>100%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <h2>Annual Operating Expenses</h2>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Annual Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Program Coordination (20 hrs/week)</td>
+                                <td class="highlight-blue">$26,000</td>
+                            </tr>
+                            <tr>
+                                <td>Maintenance Supplies</td>
+                                <td class="highlight-blue">$9,000</td>
+                            </tr>
+                            <tr>
+                                <td>Replacement Reserve</td>
+                                <td class="highlight-blue">$7,500</td>
+                            </tr>
+                            <tr>
+                                <td>Insurance and Liability</td>
+                                <td class="highlight-blue">$3,800</td>
+                            </tr>
+                            <tr>
+                                <td>Workshop Supplies</td>
+                                <td class="highlight-blue">$3,600</td>
+                            </tr>
+                            <tr>
+                                <td>Training Materials</td>
+                                <td class="highlight-blue">$2,400</td>
+                            </tr>
+                            <tr style="font-weight: bold; background-color: #f9fafb;">
+                                <td>Total Annual Operating Cost</td>
+                                <td class="highlight-blue">$52,300</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <h2>Cost Savings & Value Creation</h2>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Annual Value</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Staff Redirection</td>
+                                <td class="highlight-green">$30,420</td>
+                                <td>23.4 weekly hours @ $25/hour</td>
+                            </tr>
+                            <tr>
+                                <td>Service Duration</td>
+                                <td class="highlight-green">$48,000</td>
+                                <td>Faster transition to independence</td>
+                            </tr>
+                            <tr>
+                                <td>Transportation Reduction</td>
+                                <td class="highlight-green">$27,300</td>
+                                <td>Direct costs avoided</td>
+                            </tr>
+                            <tr>
+                                <td>Emergency Intervention</td>
+                                <td class="highlight-green">$16,400</td>
+                                <td>Crisis management avoidance</td>
+                            </tr>
+                            <tr style="font-weight: bold; background-color: #f9fafb;">
+                                <td>Total Annual Value Creation</td>
+                                <td class="highlight-green">$122,120</td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <h2>Five-Year Financial Sustainability</h2>
+                    <div style="margin: 1rem 0;">
+                        <h3 style="margin-bottom: 1rem;">Funding Source Transition</h3>
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>Year 1: External Funding Dependency</span>
+                                <span>60%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div style="width: 60%; height: 100%; background: linear-gradient(to right, #ef4444 0%, #f59e0b 60%, #10b981 100%);"></div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>Year 5: Self-Sustaining Operation</span>
+                                <span>65% Direct Revenue</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div style="width: 100%; height: 100%; background: linear-gradient(to right, #ef4444 25%, #f59e0b 35%, #10b981 100%);"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="key-points">
+                        <p><strong>Financial ROI: 2.7 years</strong></p>
+                        <p><strong>5-Year Cumulative Value: $658,550</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Metrics Section -->
+        <div id="metrics" class="view-section">
+            <div class="grid">
+                <div class="card">
+                    <h2>Taxpayer Cost Avoidance</h2>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Annual Savings</th>
+                                <th>Impact</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Emergency Services</td>
+                                <td class="highlight-green">$43,900</td>
+                                <td>23% reduction in ER visits</td>
+                            </tr>
+                            <tr>
+                                <td>Public Assistance</td>
+                                <td class="highlight-green">$32,400</td>
+                                <td>Sustainable employment increase</td>
+                            </tr>
+                            <tr>
+                                <td>Shelter Duration</td>
+                                <td class="highlight-green">$25,600</td>
+                                <td>16 days average reduction</td>
+                            </tr>
+                            <tr>
+                                <td>Law Enforcement</td>
+                                <td class="highlight-green">$17,600</td>
+                                <td>38% reduction in police contacts</td>
+                            </tr>
+                            <tr>
+                                <td>Transit Subsidy</td>
+                                <td class="highlight-green">$16,400</td>
+                                <td>Reduced public transit dependency</td>
+                            </tr>
+                            <tr>
+                                <td>Medical Transport</td>
+                                <td class="highlight-green">$6,800</td>
+                                <td>16% reduction in medical transports</td>
+                            </tr>
+                            <tr style="font-weight: bold; background-color: #f9fafb;">
+                                <td>Total Annual Taxpayer Savings</td>
+                                <td class="highlight-green">$142,700</td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <h2>Key Performance Indicators</h2>
+                    <div style="margin: 1rem 0;">
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>Transportation Reliability</span>
+                                <span class="highlight-green">89%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 89%;"></div>
+                            </div>
+                            <small style="color: #6b7280;">On-time arrival to work shifts</small>
+                        </div>
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>Weather Resilience</span>
+                                <span class="highlight-green">92%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 92%;"></div>
+                            </div>
+                            <small style="color: #6b7280;">Successful trips despite adverse weather</small>
+                        </div>
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>Payment Compliance</span>
+                                <span class="highlight-green">85%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 85%;"></div>
+                            </div>
+                            <small style="color: #6b7280;">On-time lease payments</small>
+                        </div>
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>Maintenance Compliance</span>
+                                <span class="highlight-green">78%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 78%;"></div>
+                            </div>
+                            <small style="color: #6b7280;">Participants performing required maintenance</small>
+                        </div>
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>Skill Development</span>
+                                <span class="highlight-green">72%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 72%;"></div>
+                            </div>
+                            <small style="color: #6b7280;">Advancing to advanced certification</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Return on Investment Analysis</h2>
+                    <div class="metric-grid">
+                        <div class="metric-card">
+                            <div class="metric-value">2.7 years</div>
+                            <div class="metric-label">Financial ROI Timeline</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">$264,820</div>
+                            <div class="metric-label">1-Year Value Creation</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">$658,550</div>
+                            <div class="metric-label">5-Year Cumulative Value</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">143%</div>
+                            <div class="metric-label">5-Year ROI Percentage</div>
+                        </div>
+                    </div>
+                    <div class="key-points">
+                        <p><strong>Key ROI Insights:</strong></p>
+                        <ul>
+                            <li>Program generates positive value from first year</li>
+                            <li>Investment recovery in less than 3 years</li>
+                            <li>Substantial long-term financial benefits</li>
+                            <li>Multiple stakeholder value creation</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Employment Impact Summary</h2>
+                    <div class="key-points">
+                        <p><strong>Key Improvements:</strong></p>
+                        <ul>
+                            <li>Employment placement increased from 37% to 59% (22 percentage points)</li>
+                            <li>90-day job retention improved from 42% to 70% (28 percentage points)</li>
+                            <li>Interview access expanded from 45% to 90% (45 percentage points)</li>
+                            <li>Average job search radius expanded by 5.4 miles</li>
+                            <li>On-time work arrival improved to 89%</li>
+                        </ul>
+                    </div>
+                    
+                    <h3 style="margin-top: 1.5rem; margin-bottom: 1rem;">Transportation Barrier Elimination</h3>
+                    <div class="metric-grid">
+                        <div class="metric-card">
+                            <div class="metric-value">214%</div>
+                            <div class="metric-label">Job Opportunity Increase</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">64%</div>
+                            <div class="metric-label">Transportation Time Reduction</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">$150</div>
+                            <div class="metric-label">Monthly Savings per Participant</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">95%</div>
+                            <div class="metric-label">Interview Accessibility</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Implementation Section -->
+        <div id="implementation" class="view-section">
+            <div class="grid">
+                <div class="card">
+                    <h2>Implementation Timeline</h2>
+                    <div style="margin: 1rem 0;">
+                        <div style="margin-bottom: 2rem; padding: 1rem; border-left: 4px solid #2563eb; background: #f8fafc;">
+                            <h3 style="color: #2563eb; margin-bottom: 0.5rem;">Phase 1: Planning & Infrastructure (Months 1-3)</h3>
+                            <p><strong>Key Activities:</strong> Workshop space development, tool acquisition, initial trike procurement, security system development</p>
+                            <p><strong>Milestone:</strong> Workshop equipped, 10 trikes acquired, program handbook completed</p>
+                        </div>
+                        
+                        <div style="margin-bottom: 2rem; padding: 1rem; border-left: 4px solid #059669; background: #f0fdf4;">
+                            <h3 style="color: #059669; margin-bottom: 0.5rem;">Phase 2: Pilot Implementation (Months 4-7)</h3>
+                            <p><strong>Key Activities:</strong> Participant selection, equipment deployment, weather modification testing</p>
+                            <p><strong>Milestone:</strong> 10 participants onboarded, maintenance training completed, outcomes documented</p>
+                        </div>
+                        
+                        <div style="margin-bottom: 2rem; padding: 1rem; border-left: 4px solid #f59e0b; background: #fffbeb;">
+                            <h3 style="color: #f59e0b; margin-bottom: 0.5rem;">Phase 3: Program Expansion (Months 8-16)</h3>
+                            <p><strong>Key Activities:</strong> Fleet expansion to 25 participants, community integration, impact evaluation</p>
+                            <p><strong>Milestone:</strong> Full program implementation, additional funding secured</p>
+                        </div>
+                        
+                        <div style="margin-bottom: 2rem; padding: 1rem; border-left: 4px solid #8b5cf6; background: #faf5ff;">
+                            <h3 style="color: #8b5cf6; margin-bottom: 0.5rem;">Phase 4: Self-Sustaining Model (Months 17-24)</h3>
+                            <p><strong>Key Activities:</strong> Cooperative structure development, social enterprise implementation</p>
+                            <p><strong>Milestone:</strong> Self-sustaining operational model achieved, expansion proposal developed</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Program Structure</h2>
+                    <h3 style="margin-bottom: 1rem;">Eligibility & Selection</h3>
+                    <div class="key-points">
+                        <p><strong>Primary Requirements:</strong></p>
+                        <ul>
+                            <li>Active job search (minimum 3 applications weekly) OR current employment (15+ hours weekly)</li>
+                            <li>Residence at Churches United facility or affiliated housing</li>
+                            <li>Completion of basic safety training</li>
+                            <li>Demonstrated responsibility through program participation</li>
+                        </ul>
+                    </div>
+                    
+                    <h3 style="margin: 1.5rem 0 1rem 0;">Financial Structure</h3>
+                    <div class="metric-grid">
+                        <div class="metric-card">
+                            <div class="metric-value">$40</div>
+                            <div class="metric-label">Monthly Lease Payment</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">50%</div>
+                            <div class="metric-label">Payments Toward Ownership</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">24 months</div>
+                            <div class="metric-label">Full Ownership Timeline</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">$10</div>
+                            <div class="metric-label">Monthly Maintenance Fund</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Technical Specifications</h2>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Component</th>
+                                <th>Specification</th>
+                                <th>Benefits</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Frame Design</td>
+                                <td>Three-wheel aluminum alloy, 400 lb capacity</td>
+                                <td>Enhanced stability and durability</td>
+                            </tr>
+                            <tr>
+                                <td>Electric Assist</td>
+                                <td>500W motor, 25-40 mile range</td>
+                                <td>Reduced physical strain, extended range</td>
+                            </tr>
+                            <tr>
+                                <td>Weather Protection</td>
+                                <td>Modular enclosure system with windshield</td>
+                                <td>All-weather transportation capability</td>
+                            </tr>
+                            <tr>
+                                <td>Security Features</td>
+                                <td>GPS tracking, immobilization system</td>
+                                <td>Asset protection and recovery capability</td>
+                            </tr>
+                            <tr>
+                                <td>Safety Systems</td>
+                                <td>Hydraulic disc brakes, LED lighting</td>
+                                <td>Enhanced safety and visibility</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <h2>Skill Development Component</h2>
+                    <div style="margin: 1rem 0;">
+                        <h3 style="margin-bottom: 1rem;">Training Curriculum</h3>
+                        
+                        <div style="margin-bottom: 1.5rem;">
+                            <h4 style="color: #2563eb; margin-bottom: 0.5rem;">Basic Maintenance Training (10 hours)</h4>
+                            <ul style="margin-left: 1rem; list-style-type: disc;">
+                                <li>Tire maintenance and repair</li>
+                                <li>Basic adjustment techniques</li>
+                                <li>Cleaning and lubrication protocols</li>
+                                <li>Safety inspection procedures</li>
+                            </ul>
+                        </div>
+                        
+                        <div style="margin-bottom: 1.5rem;">
+                            <h4 style="color: #059669; margin-bottom: 0.5rem;">Advanced Repair Certification (30 hours)</h4>
+                            <ul style="margin-left: 1rem; list-style-type: disc;">
+                                <li>Drivetrain maintenance and repair</li>
+                                <li>Brake system adjustment</li>
+                                <li>Electrical system diagnostics</li>
+                                <li>Component replacement techniques</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="key-points">
+                        <p><strong>Learning Outcomes:</strong></p>
+                        <ul>
+                            <li>72% of participants advance to advanced certification</li>
+                            <li>Transferable mechanical skills for employment</li>
+                            <li>Peer teaching and community service opportunities</li>
+                            <li>Enhanced self-sufficiency and confidence</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // View switching functionality
+        function showView(viewName) {
+            // Hide all view sections
+            const viewSections = document.querySelectorAll('.view-section');
+            viewSections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all nav tabs
+            const navTabs = document.querySelectorAll('.nav-tab');
+            navTabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected view section
+            document.getElementById(viewName).classList.add('active');
+            
+            // Add active class to clicked nav tab
+            event.target.classList.add('active');
+            
+            // Create impact chart if overview is selected
+            if (viewName === 'overview') {
+                createImpactChart();
+            }
+        }
+
+        // Create impact chart
+        function createImpactChart() {
+            const data = [
+                { name: 'Economic Empowerment', value: 85, color: '#2563eb' },
+                { name: 'Dignity & Independence', value: 90, color: '#059669' },
+                { name: 'Barrier Elimination', value: 85, color: '#f59e0b' },
+                { name: 'Organizational Benefits', value: 80, color: '#8b5cf6' },
+                { name: 'Community Benefits', value: 75, color: '#ef4444' },
+                { name: 'Taxpayer Benefits', value: 65, color: '#06b6d4' }
+            ];
+            
+            const svg = document.querySelector('#impact-bars');
+            const labels = document.querySelector('#impact-labels');
+            
+            // Clear existing content
+            svg.innerHTML = '';
+            labels.innerHTML = '';
+            
+            const maxValue = 100;
+            const barHeight = 25;
+            const barSpacing = 35;
+            const maxBarWidth = 300;
+            
+            data.forEach((item, index) => {
+                const y = index * barSpacing + 10;
+                const barWidth = (item.value / maxValue) * maxBarWidth;
+                
+                // Create bar
+                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                rect.setAttribute('x', '90');
+                rect.setAttribute('y', y);
+                rect.setAttribute('width', barWidth);
+                rect.setAttribute('height', barHeight);
+                rect.setAttribute('fill', item.color);
+                rect.setAttribute('opacity', '0.8');
+                
+                // Add hover effect
+                rect.addEventListener('mouseenter', function() {
+                    this.setAttribute('opacity', '1');
+                });
+                rect.addEventListener('mouseleave', function() {
+                    this.setAttribute('opacity', '0.8');
+                });
+                
+                svg.appendChild(rect);
+                
+                // Create label
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', '85');
+                text.setAttribute('y', y + barHeight/2 + 4);
+                text.setAttribute('text-anchor', 'end');
+                text.setAttribute('font-size', '11');
+                text.setAttribute('fill', '#374151');
+                text.textContent = item.name.length > 15 ? item.name.substring(0, 15) + '...' : item.name;
+                
+                labels.appendChild(text);
+                
+                // Create value label
+                const valueText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                valueText.setAttribute('x', 90 + barWidth + 5);
+                valueText.setAttribute('y', y + barHeight/2 + 4);
+                valueText.setAttribute('font-size', '11');
+                valueText.setAttribute('font-weight', 'bold');
+                valueText.setAttribute('fill', item.color);
+                valueText.textContent = item.value + '%';
+                
+                labels.appendChild(valueText);
+            });
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            createImpactChart();
+        });
+
+        // Add animation to progress bars when they come into view
+        function animateProgressBars() {
+            const progressBars = document.querySelectorAll('.progress-fill');
+            progressBars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 100);
+            });
+        }
+
+        // Call animation when switching views
+        const originalShowView = showView;
+        showView = function(viewName) {
+            originalShowView.call(this, viewName);
+            setTimeout(animateProgressBars, 100);
+        };
+    </script>
+</body>
+</html>
