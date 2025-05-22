@@ -160,7 +160,7 @@ This approach eliminates traditional limitations where residents could only work
 - **Primary Funding Targets**: Minnesota DEED Workforce Development Grant, Otto Bremer Trust, T-Mobile Hometown Grants
 - **Device Acquisition Strategy**: Partnerships with PCs for People, telecommunications providers, and technology companies
 
-[View Complete Call to Faith Documentation](programs/call-to-faith/README.md)
+[View Complete Call to Faith Documentation](https://tim-spurlin.github.io/churches-united-sustainability-initiative/programs/call-to-faith/)
 
 [View Call to Faith Economic Impact Analysis](visualizations/call-to-faith-impact.tsx)
 
