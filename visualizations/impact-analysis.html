@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Churches United Sustainability Initiative - Impact Analysis</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/recharts@2.8.0/umd/Recharts.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        .initiative-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .initiative-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .metric-indicator {
+            position: relative;
+            overflow: hidden;
+        }
+        .metric-indicator::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+        .metric-indicator:hover::before {
+            left: 100%;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.2s; }
+        .stagger-3 { animation-delay: 0.3s; }
+        .stagger-4 { animation-delay: 0.4s; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { 
+            LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, 
+            Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell,
+            RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
+            AreaChart, Area, ComposedChart
+        } = Recharts;
+
+        // Comprehensive Churches United Data
+        const organizationOverview = {
+            name: "Churches United for the Homeless",
+            established: 1987,
+            location: "1901 1st Ave N, Moorhead, MN 56560",
+            mission: "To provide Safe Shelter, Stable Housing, Nutritious Food, and a Path Toward Healing",
+            dailyServed: 450,
+            annualBudget: 2400000,
+            staff: 62,
+            supportingCongregations: 150
+        };
+
+        const crisisData = {
+            august2024Emergency: 61000,
+            additionalNeeded: 140000,
+            monthlyOperating: 200000,
+            survivalFunding: 1000000,
+            timeframe: "Until July 2025"
+        };
+
+        const facilities = [
+            {
+                name: "Micah's Mission",
+                type: "Emergency Shelter & Community Center",
+                capacity: 110,
+                features: ["24/7 Operations", "Family Accommodation", "Case Management", "Health Services"],
+                renovation: { year: 2023, cost: 4300000 }
+            },
+            {
+                name: "Dorothy Day House", 
+                type: "Men's Shelter",
+                capacity: 15,
+                status: "Operations on hold",
+                features: ["Community Laundry", "Shower Access", "Family Dinners"]
+            },
+            {
+                name: "Bright Sky Apartments",
+                type: "Permanent Supportive Housing", 
+                units: 43,
+                population: "Previously homeless families",
+                features: ["Case Management", "Health Services", "Food Pantry"]
+            },
+            {
+                name: "Silver Linings Apartments",
+                type: "Senior Housing",
+                units: 36,
+                status: "Opening 2025",
+                population: "Seniors 55+ who experienced homelessness"
+            }
+        ];
+
+        const initiatives = [
+            {
+                name: "Trinity Trikes",
+                description: "Weather-protected electric tricycles for employment transportation",
+                participants: 25,
+                investment: 56750,
+                annualSavings: 384400,
+                roi: "2.7 years",
+                impact: {
+                    employmentIncrease: "37% to 63%",
+                    co2Reduction: "18.7 tons annually",
+                    taxpayerSavings: 142700
+                }
+            },
+            {
+                name: "Call to Faith",
+                description: "Smartphone access program eliminating communication barriers",
+                participants: 50,
+                investment: 62000,
+                annualSavings: 175000,
+                roi: "3-4 months",
+                impact: {
+                    employmentAccess: "214% increase in job opportunities",
+                    digitalInclusion: "100% of participants gain digital access",
+                    communicationBarriers: "95% reduction"
+                }
+            },
+            {
+                name: "ONWARD Employment Program",
+                description: "Comprehensive employment support and job placement",
+                participants: 200,
+                investment: 150000,
+                annualSavings: 300000,
+                roi: "6 months",
+                impact: {
+                    jobPlacement: "75% success rate",
+                    wageIncrease: "Average $3.50/hour improvement",
+                    housingStability: "89% maintain housing after employment"
+                }
+            }
+        ];
+
+        const financialSustainabilityPlan = [
+            {
+                category: "Technology Cost Reduction",
+                year1: 384400,
+                year2: 400000,
+                year3: 420000,
+                description: "Security, utility automation, process optimization"
+            },
+            {
+                category: "Grant Funding Diversification", 
+                year1: 400000,
+                year2: 950000,
+                year3: 1200000,
+                description: "Strategic multi-source funding matrix"
+            },
+            {
+                category: "Program Revenue Generation",
+                year1: 150000,
+                year2: 275000,
+                year3: 350000,
+                description: "Social enterprise and fee-for-service components"
+            },
+            {
+                category: "Community Value Demonstration",
+                year1: 200000,
+                year2: 300000,
+                year3: 400000,
+                description: "Documented taxpayer savings and economic impact"
+            }
+        ];
+
+        const technologyImplementations = [
+            {
+                name: "Security System Enhancement",
+                savings: 58000,
+                cost: 5000,
+                roi: "1-2 months",
+                description: "AI-powered monitoring reducing insurance and staffing costs"
+            },
+            {
+                name: "Utility Management Automation",
+                savings: 44400,
+                cost: 15000,
+                roi: "4-5 months", 
+                description: "Smart systems reducing energy consumption by 20-30%"
+            },
+            {
+                name: "Operational Process Automation",
+                savings: 54000,
+                cost: 10000,
+                roi: "3 months",
+                description: "Automated intake, inventory, and volunteer management"
+            },
+            {
+                name: "Integrated Data Management",
+                savings: 53000,
+                cost: 20000,
+                roi: "5 months",
+                description: "Centralized reporting and outcome tracking system"
+            },
+            {
+                name: "Grant Management System", 
+                savings: 175000,
+                cost: 12000,
+                roi: "Immediate",
+                description: "Automated opportunity identification and application management"
+            }
+        ];
+
+        const impactMetrics = [
+            {
+                metric: "People Served Daily",
+                current: 450,
+                projected: 600,
+                improvement: "33%"
+            },
+            {
+                metric: "Employment Success Rate",
+                current: 37,
+                projected: 75,
+                improvement: "103%"
+            },
+            {
+                metric: "Housing Stability Rate",
+                current: 65,
+                projected: 89,
+                improvement: "37%"
+            },
+            {
+                metric: "Cost Per Person Served",
+                current: 5333,
+                projected: 4000,
+                improvement: "25% reduction"
+            },
+            {
+                metric: "Emergency Interventions",
+                current: 240,
+                projected: 85,
+                improvement: "65% reduction"
+            },
+            {
+                metric: "Staff Efficiency Hours",
+                current: 2080,
+                projected: 2500,
+                improvement: "20% increase"
+            }
+        ];
+
+        const communityImpact = [
+            {
+                category: "Public Safety",
+                value: 125000,
+                description: "Reduced emergency services, law enforcement contacts"
+            },
+            {
+                category: "Healthcare System",
+                value: 180000,
+                description: "Decreased ER visits, improved preventative care"
+            },
+            {
+                category: "Economic Development",
+                value: 220000,
+                description: "Workforce stability, reduced turnover costs"
+            },
+            {
+                category: "Environmental Benefits",
+                value: 85000,
+                description: "Reduced emissions, sustainable transportation"
+            },
+            {
+                category: "Social Cohesion",
+                value: 95000,
+                description: "Community integration, stigma reduction"
+            }
+        ];
+
+        const fundingStrategy = [
+            {
+                source: "Government Grants",
+                amount: 1200000,
+                percentage: 35,
+                timeline: "12-18 months"
+            },
+            {
+                source: "Foundation Grants",
+                amount: 800000,
+                percentage: 23,
+                timeline: "6-12 months"
+            },
+            {
+                source: "Corporate Partnerships",
+                amount: 600000,
+                percentage: 17,
+                timeline: "3-6 months"
+            },
+            {
+                source: "Faith Community",
+                amount: 500000,
+                percentage: 15,
+                timeline: "Ongoing"
+            },
+            {
+                source: "Individual Donors",
+                amount: 350000,
+                percentage: 10,
+                timeline: "Ongoing"
+            }
+        ];
+
+        const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4'];
+
+        const CustomTooltip = ({ active, payload, label }) => {
+            if (active && payload && payload.length) {
+                return (
+                    <div className="bg-white p-4 border rounded-lg shadow-lg text-sm max-w-xs">
+                        <p className="font-bold text-gray-700">{label}</p>
+                        {payload.map((entry, index) => (
+                            <p key={`item-${index}`} className="text-sm" style={{ color: entry.color }}>
+                                {`${entry.name}: ${typeof entry.value === 'number' ? entry.value.toLocaleString() : entry.value}`}
+                            </p>
+                        ))}
+                        {payload[0].payload.description && (
+                            <p className="text-xs text-gray-600 mt-2">{payload[0].payload.description}</p>
+                        )}
+                    </div>
+                );
+            }
+            return null;
+        };
+
+        const ChurchesUnitedImpactAnalysis = () => {
+            const [activeView, setActiveView] = useState('overview');
+            const [selectedInitiative, setSelectedInitiative] = useState('Trinity Trikes');
+
+            const selectedInitiativeData = initiatives.find(init => init.name === selectedInitiative) || initiatives[0];
+
+            return (
+                <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+                    {/* Header */}
+                    <div className="bg-white shadow-lg">
+                        <div className="max-w-7xl mx-auto px-4 py-6">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h1 className="text-4xl font-bold text-gray-900">Churches United Sustainability Initiative</h1>
+                                    <p className="text-xl text-gray-600 mt-2">Comprehensive Impact Analysis & Strategic Implementation</p>
+                                    <div className="flex items-center space-x-6 mt-4 text-sm">
+                                        <div className="flex items-center">
+                                            <span className="text-gray-500">Est.</span>
+                                            <span className="font-semibold ml-1">{organizationOverview.established}</span>
+                                        </div>
+                                        <div className="flex items-center">
+                                            <span className="text-gray-500">Daily Served:</span>
+                                            <span className="font-semibold ml-1">{organizationOverview.dailyServed}</span>
+                                        </div>
+                                        <div className="flex items-center">
+                                            <span className="text-gray-500">Staff:</span>
+                                            <span className="font-semibold ml-1">{organizationOverview.staff}</span>
+                                        </div>
+                                        <div className="flex items-center">
+                                            <span className="text-gray-500">Supporting Congregations:</span>
+                                            <span className="font-semibold ml-1">{organizationOverview.supportingCongregations}+</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                                        <h3 className="text-lg font-bold text-red-800">2024 Crisis Status</h3>
+                                        <p className="text-red-600">Required: ${crisisData.survivalFunding.toLocaleString()}</p>
+                                        <p className="text-sm text-red-500">{crisisData.timeframe}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Navigation */}
+                    <div className="max-w-7xl mx-auto px-4 py-4">
+                        <div className="flex space-x-2">
+                            {['overview', 'crisis-response', 'initiatives', 'financial', 'impact', 'implementation'].map(view => (
+                                <button
+                                    key={view}
+                                    className={`px-6 py-3 rounded-lg font-medium transition-all ${
+                                        activeView === view 
+                                            ? 'bg-blue-600 text-white shadow-lg' 
+                                            : 'bg-white text-gray-700 hover:bg-blue-50'
+                                    }`}
+                                    onClick={() => setActiveView(view)}
+                                >
+                                    {view.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="max-w-7xl mx-auto px-4 pb-8">
+                        {/* Overview View */}
+                        {activeView === 'overview' && (
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div className="bg-white rounded-xl shadow-lg p-6 fade-in-up">
+                                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Organization Overview</h2>
+                                    <div className="space-y-4">
+                                        <div className="bg-blue-50 rounded-lg p-4">
+                                            <h3 className="font-bold text-blue-800">Mission</h3>
+                                            <p className="text-blue-700">{organizationOverview.mission}</p>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="text-center p-4 bg-gray-50 rounded-lg">
+                                                <div className="text-3xl font-bold text-blue-600">{organizationOverview.dailyServed}</div>
+                                                <div className="text-sm text-gray-600">People Served Daily</div>
+                                            </div>
+                                            <div className="text-center p-4 bg-gray-50 rounded-lg">
+                                                <div className="text-3xl font-bold text-green-600">${(organizationOverview.annualBudget / 1000000).toFixed(1)}M</div>
+                                                <div className="text-sm text-gray-600">Annual Budget</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-xl shadow-lg p-6 fade-in-up stagger-1">
+                                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Facilities Overview</h2>
+                                    <div className="space-y-3 max-h-96 overflow-y-auto custom-scrollbar">
+                                        {facilities.map((facility, index) => (
+                                            <div key={index} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                                                <div className="flex justify-between items-start">
+                                                    <div>
+                                                        <h3 className="font-bold text-gray-800">{facility.name}</h3>
+                                                        <p className="text-sm text-gray-600">{facility.type}</p>
+                                                        {facility.capacity && (
+                                                            <p className="text-sm text-blue-600">Capacity: {facility.capacity} {facility.units ? 'units' : 'individuals'}</p>
+                                                        )}
+                                                    </div>
+                                                    {facility.status && (
+                                                        <span className={`px-2 py-1 rounded text-xs ${
+                                                            facility.status.includes('on hold') 
+                                                                ? 'bg-yellow-100 text-yellow-800'
+                                                                : 'bg-green-100 text-green-800'
+                                                        }`}>
+                                                            {facility.status}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                {facility.features && (
+                                                    <div className="mt-2">
+                                                        <div className="flex flex-wrap gap-1">
+                                                            {facility.features.slice(0, 3).map((feature, idx) => (
+                                                                <span key={idx} className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
+                                                                    {feature}
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-xl shadow-lg p-6 fade-in-up stagger-2">
+                                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Strategic Initiatives</h2>
+                                    <div className="h-80">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <RadarChart outerRadius={90} data={initiatives.map(init => ({
+                                                name: init.name,
+                                                participants: init.participants,
+                                                roi: parseFloat(init.roi.split(' ')[0]) * 10,
+                                                impact: 85
+                                            }))}>
+                                                <PolarGrid />
+                                                <PolarAngleAxis dataKey="name" tick={{ fill: '#666', fontSize: 12 }} />
+                                                <PolarRadiusAxis angle={90} domain={[0, 100]} />
+                                                <Radar name="Impact Score" dataKey="impact" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.6} />
+                                                <Radar name="Participants" dataKey="participants" stroke="#10B981" fill="#10B981" fillOpacity={0.3} />
+                                                <Tooltip content={<CustomTooltip />} />
+                                                <Legend />
+                                            </RadarChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-xl shadow-lg p-6 fade-in-up stagger-3">
+                                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Financial Sustainability Trajectory</h2>
+                                    <div className="h-80">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <AreaChart
+                                                data={[
+                                                    { year: 'Year 1', total: 1134400, crisis: 1000000 },
+                                                    { year: 'Year 2', total: 1925000, crisis: 0 },
+                                                    { year: 'Year 3', total: 2370000, crisis: 0 }
+                                                ]}
+                                                margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                                            >
+                                                <CartesianGrid strokeDasharray="3 3" />
+                                                <XAxis dataKey="year" />
+                                                <YAxis tickFormatter={(value) => `$${(value/1000000).toFixed(1)}M`} />
+                                                <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, '']} />
+                                                <Area type="monotone" dataKey="total" stackId="1" stroke="#10B981" fill="#10B981" name="Sustainable Revenue" />
+                                                <Area type="monotone" dataKey="crisis" stackId="1" stroke="#EF4444" fill="#EF4444" name="Crisis Gap" />
+                                                <Legend />
+                                            </AreaChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Crisis Response View */}
+                        {activeView === 'crisis-response' && (
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div className="bg-white rounded-xl shadow-lg p-6">
+                                    <h2 className="text-2xl font-bold text-red-800 mb-4">2024 Financial Crisis Analysis</h2>
+                                    <div className="space-y-4">
+                                        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                                            <h3 className="font-bold text-red-800">Immediate Crisis (August 2024)</h3>
+                                            <div className="grid grid-cols-2 gap-4 mt-2">
+                                                <div>
+                                                    <p className="text-sm text-red-600">Payroll Emergency</p>
+                                                    <p className="text-2xl font-bold text-red-700">${crisisData.august2024Emergency.toLocaleString()}</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm text-red-600">Additional Need</p>
+                                                    <p className="text-2xl font-bold text-red-700">${crisisData.additionalNeeded.toLocaleString()}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                                            <h3 className="font-bold text-yellow-800">Survival Requirements</h3>
+                                            <p className="text-3xl font-bold text-yellow-700">${crisisData.survivalFunding.toLocaleString()}</p>
+                                            <p className="text-sm text-yellow-600">{crisisData.timeframe}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-xl shadow-lg p-6">
+                                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Root Cause Analysis</h2>
+                                    <div className="h-80">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <PieChart>
+                                                <Pie
+                                                    data={[
+                                                        { name: 'Post-Pandemic Funding Cliff', value: 25 },
+                                                        { name: 'Grant Restriction Misalignment', value: 20 },
+                                                        { name: 'Service Expansion Costs', value: 18 },
+                                                        { name: 'Deficit Spending Cycle', value: 15 },
+                                                        { name: 'Delayed Tax Credits', value: 12 },
+                                                        { name: 'Limited Government Support', value: 10 }
+                                                    ]}
+                                                    cx="50%"
+                                                    cy="50%"
+                                                    labelLine={false}
+                                                    outerRadius={80}
+                                                    fill="#8884d8"
+                                                    dataKey="value"
+                                                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                                                >
+                                                    {[].map((entry, index) => (
+                                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                    ))}
+                                                </Pie>
+                                                <Tooltip />
+                                                <Legend />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-xl shadow-lg p-6 lg:col-span-2">
+                                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Technology-Driven Solution Framework</h2>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        {technologyImplementations.map((tech, index) => (
+                                            <div key={index} className="border rounded-lg p-4 hover:shadow-md transition-shadow initiative-card">
+                                                <h3 className="font-bold text-gray-800">{tech.name}</h3>
+                                                <p className="text-sm text-gray-600 mb-3">{tech.description}</p>
+                                                <div className="space-y-2">
+                                                    <div className="flex justify-between">
+                                                        <span className="text-sm text-gray-500">Annual Savings:</span>
+                                                        <span className="font-bold text-green-600">${tech.savings.toLocaleString()}</span>
+                                                    </div>
+                                                    <div className="flex justify-between">
+                                                        <span className="text-sm text-gray-500">Implementation:</span>
+                                                        <span className="font-bold text-blue-600">${tech.cost.toLocaleString()}</span>
+                                                    </div>
+                                                    <div className="flex justify-between">
+                                                        <span className="text-sm text-gray-500">ROI Timeline:</span>
+                                                        <span className="font-bold text-purple-600">{tech.roi}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="mt-6 bg-green-50 border border-green-200 rounded-lg p-4">
+                                        <h3 className="font-bold text-green-800">Total Technology Impact</h3>
+                                        <div className="grid grid-cols-3 gap-4 mt-2">
+                                            <div className="text-center">
+                                                <p className="text-2xl font-bold text-green-700">
+                                                    ${technologyImplementations.reduce((sum, tech) => sum + tech.savings, 0).toLocaleString()}
+                                                </p>
+                                                <p className="text-sm text-green-600">Annual Savings</p>
+                                            </div>
+                                            <div className="text-center">
+                                                <p className="text-2xl font-bold text-blue-700">
+                                                    ${technologyImplementations.reduce((sum, tech) => sum + tech.cost, 0).toLocaleString()}
+                                                </p>
+                                                <p className="text-sm text-blue-600">Total Investment</p>
+                                            </div>
+                                            <div className="text-center">
+                                                <p className="text-2xl font-bold text-purple-700">3-4 months</p>
+                                                <p className="text-sm text-purple-600">Average ROI</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Initiatives View */}
+                        {activeView === 'initiatives' && (
+                            <div className="space-y-6">
+                                <div className="bg-white rounded-xl shadow-lg p-6">
+                                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Strategic Program Initiatives</h2>
+                                    <div className="flex space-x-4 mb-6">
+                                        {initiatives.map(initiative => (
+                                            <button
+                                                key={initiative.name}
+                                                className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                                                    selectedInitiative === initiative.name
+                                                        ? 'bg-blue-600 text-white'
+                                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                                }`}
+                                                onClick={() => setSelectedInitiative(initiative.name)}
+                                            >
+                                                {initiative.name}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                        <div>
+                                            <h3 className="text-xl font-bold text-gray-800 mb-3">{selectedInitiativeData.name}</h3>
+                                            <p className="text-gray-600 mb-4">{selectedInitiativeData.description}</p>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="bg-blue-50 rounded-lg p-4">
+                                                    <p className="text-sm text-blue-600">Participants</p>
+                                                    <p className="text-2xl font-bold text-blue-700">{selectedInitiativeData.participants}</p>
+                                                </div>
+                                                <div className="bg-green-50 rounded-lg p-4">
+                                                    <p className="text-sm text-green-600">ROI Timeline</p>
+                                                    <p className="text-2xl font-bold text-green-700">{selectedInitiativeData.roi}</p>
+                                                </div>
+                                                <div className="bg-purple-50 rounded-lg p-4">
+                                                    <p className="text-sm text-purple-600">Investment</p>
+                                                    <p className="text-2xl font-bold text-purple-700">${selectedInitiativeData.investment.toLocaleString()}</p>
+                                                </div>
+                                                <div className="bg-yellow-50 rounded-lg p-4">
+                                                    <p className="text-sm text-yellow-600">Annual Savings</p>
+                                                    <p className="text-2xl font-bold text-yellow-700">${selectedInitiativeData.annualSavings.toLocaleString()}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div>
+                                            <h3 className="text-xl font-bold text-gray-800 mb-3">Key Impact Metrics</h3>
+                                            <div className="space-y-3">
+                                                {Object.entries(selectedInitiativeData.impact).map(([key, value]) => (
+                                                    <div key={key} className="border rounded-lg p-3">
+                                                        <div className="flex justify-between items-center">
+                                                            <span className="text-sm text-gray-600 capitalize">
+                                                                {key.replace(/([A-Z])/g, ' $1').trim()}
+                                                            </span>
+                                                            <span className="font-bold text-blue-600">{value}</span>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-xl shadow-lg p-6">
+                                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Comparative Initiative Analysis</h2>
+                                    <div className="h-80">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <ComposedChart
+                                                data={initiatives}
+                                                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                                            >
+                                                <CartesianGrid strokeDasharray="3 3" />
+                                                <XAxis dataKey="name" />
+                                                <YAxis yAxisId="left" tickFormatter={(value) => `$${(value/1000).toFixed(0)}K`} />
+                                                <YAxis yAxisId="right" orientation="right" />
+                                                <Tooltip formatter={(value, name) => [
+                                                    name.includes('Participants') ? value : `$${value.toLocaleString()}`,
+                                                    name
+                                                ]} />
+                                                <Legend />
+                                                <Bar yAxisId="left" dataKey="investment" fill="#EF4444" name="Investment" />
+                                                <Bar yAxisId="left" dataKey="annualSavings" fill="#10B981" name="Annual Savings" />
+                                                <Line yAxisId="right" type="monotone" dataKey="participants" stroke="#3B82F6" name="Participants" />
+                                            </ComposedChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Financial View */}
+                        {activeView === 'financial' && (
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div className="bg-white rounded-xl shadow-lg p-6">
+                                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Funding Strategy Matrix</h2>
+                                    <div className="h-80">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <PieChart>
+                                                <Pie
+                                                    data={fundingStrategy}
+                                                    cx="50%"
+                                                    cy="50%"
+                                                    labelLine={false}
+                                                    outerRadius={80}
+                                                    fill="#8884d8"
+                                                    dataKey="amount"
+                                                    nameKey="source"
+                                                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                                                >
+                                                    {fundingStrategy.map((entry, index) => (
+                                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                    ))}
+                                                </Pie>
+                                                <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, 'Amount']} />
+                                                <Legend />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                    <div className="mt-4">
+                                        <p className="text-center text-lg font-bold text-gray-800">
+                                            Total Strategic Funding: ${fundingStrategy.reduce((sum, item) => sum + item.amount, 0).toLocaleString()}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-xl shadow-lg p-6">
+                                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Multi-Year Financial Trajectory</h2>
+                                    <div className="h-80">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <AreaChart
+                                                data={[
+                                                    { year: 'Year 1', ...financialSustainabilityPlan.reduce((acc, item) => {
+                                                        acc[item.category] = item.year1;
+                                                        return acc;
+                                                    }, {}) },
+                                                    { year: 'Year 2', ...financialSustainabilityPlan.reduce((acc, item) => {
+                                                        acc[item.category] = item.year2;
+                                                        return acc;
+                                                    }, {}) },
+                                                    { year: 'Year 3', ...financialSustainabilityPlan.reduce((acc, item) => {
+                                                        acc[item.category] = item.year3;
+                                                        return acc;
+                                                    }, {}) }
+                                                ]}
+                                                margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                                            >
+                                                <CartesianGrid strokeDasharray="3 3" />
+                                                <XAxis dataKey="year" />
+                                                <YAxis tickFormatter={(value) => `$${(value/1000000).toFixed(1)}M`} />
+                                                <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, '']} />
+                                                {financialSustainabilityPlan.map((item, index) => (
+                                                    <Area 
+                                                        key={item.category}
+                                                        type="monotone" 
+                                                        dataKey={item.category} 
+                                                        stackId="1" 
+                                                        stroke={COLORS[index]} 
+                                                        fill={COLORS[index]} 
+                                                        name={item.category}
+                                                    />
+                                                ))}
+                                                <Legend />
+                                            </AreaChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-xl shadow-lg p-6 lg:col-span-2">
+                                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Financial Sustainability Components</h2>
+                                    <div className="space-y-4">
+                                        {financialSustainabilityPlan.map((component, index) => (
+                                            <div key={index} className="border rounded-lg p-4">
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <h3 className="font-bold text-gray-800">{component.category}</h3>
+                                                    <div className="text-right">
+                                                        <p className="text-sm text-gray-500">3-Year Total</p>
+                                                        <p className="font-bold text-green-600">
+                                                            ${(component.year1 + component.year2 + component.year3).toLocaleString()}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <p className="text-gray-600 mb-3">{component.description}</p>
+                                                <div className="grid grid-cols-3 gap-4">
+                                                    <div className="bg-blue-50 rounded p-3 text-center">
+                                                        <p className="text-sm text-blue-600">Year 1</p>
+                                                        <p className="font-bold text-blue-700">${component.year1.toLocaleString()}</p>
+                                                    </div>
+                                                    <div className="bg-green-50 rounded p-3 text-center">
+                                                        <p className="text-sm text-green-600">Year 2</p>
+                                                        <p className="font-bold text-green-700">${component.year2.toLocaleString()}</p>
+                                                    </div>
+                                                    <div className="bg-purple-50 rounded p-3 text-center">
+                                                        <p className="text-sm text-purple-600">Year 3</p>
+                                                        <p className="font-bold text-purple-700">${component.year3.toLocaleString()}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Impact View */}
+                        {activeView === 'impact' && (
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div className="bg-white rounded-xl shadow-lg p-6">
+                                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Key Performance Metrics</h2>
+                                    <div className="space-y-4">
+                                        {impactMetrics.map((metric, index) => (
+                                            <div key={index} className="border rounded-lg p-4 metric-indicator">
+                                                <div className="flex justify-between items-center mb-2">
+                                                    <h3 className="font-bold text-gray-800">{metric.metric}</h3>
+                                                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-medium">
+                                                        {metric.improvement}
+                                                    </span>
+                                                </div>
+                                                <div className="flex justify-between items-center">
+                                                    <div>
+                                                        <p className="text-sm text-gray-500">Current</p>
+                                                        <p className="font-bold text-red-600">{metric.current.toLocaleString()}</p>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p className="text-sm text-gray-500">Projected</p>
+                                                        <p className="font-bold text-green-600">{metric.projected.toLocaleString()}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-xl shadow-lg p-6">
+                                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Community Impact Value</h2>
+                                    <div className="h-80">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <BarChart
+                                                data={communityImpact}
+                                                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                                                layout="vertical"
+                                            >
+                                                <CartesianGrid strokeDasharray="3 3" />
+                                                <XAxis type="number" tickFormatter={(value) => `$${(value/1000).toFixed(0)}K`} />
+                                                <YAxis type="category" dataKey="category" width={120} />
+                                                <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, 'Annual Value']} />
+                                                <Bar dataKey="value" fill="#3B82F6" />
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                    <div className="mt-4 text-center">
+                                        <p className="text-lg font-bold text-gray-800">
+                                            Total Community Value: ${communityImpact.reduce((sum, item) => sum + item.value, 0).toLocaleString()}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-xl shadow-lg p-6 lg:col-span-2">
+                                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Comprehensive Impact Analysis</h2>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg">
+                                            <h3 className="text-lg font-bold text-blue-800">Organizational Efficiency</h3>
+                                            <p className="text-4xl font-bold text-blue-600 my-4">384%</p>
+                                            <p className="text-sm text-blue-700">Increase in cost-effectiveness through technology implementation</p>
+                                        </div>
+                                        <div className="text-center p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-lg">
+                                            <h3 className="text-lg font-bold text-green-800">Employment Success</h3>
+                                            <p className="text-4xl font-bold text-green-600 my-4">103%</p>
+                                            <p className="text-sm text-green-700">Improvement in employment placement rates through integrated programs</p>
+                                        </div>
+                                        <div className="text-center p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg">
+                                            <h3 className="text-lg font-bold text-purple-800">Community Value</h3>
+                                            <p className="text-4xl font-bold text-purple-600 my-4">$705K</p>
+                                            <p className="text-sm text-purple-700">Annual community value creation across all impact categories</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Implementation View */}
+                        {activeView === 'implementation' && (
+                            <div className="bg-white rounded-xl shadow-lg p-6">
+                                <h2 className="text-2xl font-bold text-gray-800 mb-6">Implementation Roadmap</h2>
+                                
+                                <div className="space-y-8">
+                                    {[
+                                        {
+                                            phase: "Phase 1: Crisis Stabilization",
+                                            timeline: "Months 1-3",
+                                            focus: "Immediate technology implementations and funding acquisition",
+                                            initiatives: [
+                                                "Security System Enhancement (Month 1)",
+                                                "Utility Management Automation (Month 2)",
+                                                "Grant Management System Implementation (Month 2)",
+                                                "Emergency Funding Campaign Execution",
+                                                "Staff Optimization and Process Automation"
+                                            ],
+                                            budget: 45000,
+                                            savings: 287400
+                                        },
+                                        {
+                                            phase: "Phase 2: Program Integration",
+                                            timeline: "Months 4-9",
+                                            focus: "Trinity Trikes and Call to Faith program launches",
+                                            initiatives: [
+                                                "Trinity Trikes Pilot Implementation (10 participants)",
+                                                "Call to Faith Program Launch (25 participants)",
+                                                "Integrated Data Management System",
+                                                "Community Partnership Development",
+                                                "Employer Engagement Strategy"
+                                            ],
+                                            budget: 118750,
+                                            savings: 559400
+                                        },
+                                        {
+                                            phase: "Phase 3: Scale and Sustainability",
+                                            timeline: "Months 10-18",
+                                            focus: "Full program expansion and revenue diversification",
+                                            initiatives: [
+                                                "Trinity Trikes Full Implementation (25 participants)",
+                                                "Call to Faith Expansion (50 participants)",
+                                                "ONWARD Employment Program Enhancement",
+                                                "Social Enterprise Component Development",
+                                                "Multi-Year Funding Agreement Securization"
+                                            ],
+                                            budget: 200000,
+                                            savings: 950000
+                                        },
+                                        {
+                                            phase: "Phase 4: Long-Term Resilience",
+                                            timeline: "Months 19-24",
+                                            focus: "Sustainable operations and expansion planning",
+                                            initiatives: [
+                                                "Operational Reserve Establishment",
+                                                "Replication Framework Development",
+                                                "Advanced Technology Integration",
+                                                "Community Leadership Transition",
+                                                "Expansion Planning for Additional Locations"
+                                            ],
+                                            budget: 150000,
+                                            savings: 1200000
+                                        }
+                                    ].map((phase, index) => (
+                                        <div key={index} className="relative">
+                                            <div className="flex items-start">
+                                                <div className="flex-shrink-0 w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-6">
+                                                    {index + 1}
+                                                </div>
+                                                <div className="flex-grow">
+                                                    <div className="bg-gray-50 rounded-lg p-6">
+                                                        <div className="flex justify-between items-start mb-4">
+                                                            <div>
+                                                                <h3 className="text-xl font-bold text-gray-800">{phase.phase}</h3>
+                                                                <p className="text-blue-600 font-medium">{phase.timeline}</p>
+                                                                <p className="text-gray-600 mt-2">{phase.focus}</p>
+                                                            </div>
+                                                            <div className="text-right">
+                                                                <div className="bg-blue-100 rounded-lg p-3 mb-2">
+                                                                    <p className="text-sm text-blue-600">Investment</p>
+                                                                    <p className="font-bold text-blue-700">${phase.budget.toLocaleString()}</p>
+                                                                </div>
+                                                                <div className="bg-green-100 rounded-lg p-3">
+                                                                    <p className="text-sm text-green-600">Annual Value</p>
+                                                                    <p className="font-bold text-green-700">${phase.savings.toLocaleString()}</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <h4 className="font-bold text-gray-700 mb-2">Key Initiatives</h4>
+                                                            <ul className="space-y-1">
+                                                                {phase.initiatives.map((initiative, idx) => (
+                                                                    <li key={idx} className="flex items-center">
+                                                                        <span className="text-green-500 mr-2">✓</span>
+                                                                        <span className="text-gray-700">{initiative}</span>
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {index < 3 && (
+                                                <div className="w-0.5 h-8 bg-blue-600 ml-6 mt-2"></div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div className="mt-8 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-6">
+                                    <h3 className="text-xl font-bold text-gray-800 mb-4">Implementation Success Metrics</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                        <div className="text-center">
+                                            <p className="text-3xl font-bold text-green-600">$513.75K</p>
+                                            <p className="text-sm text-gray-600">Total Investment</p>
+                                        </div>
+                                        <div className="text-center">
+                                            <p className="text-3xl font-bold text-blue-600">$2.996M</p>
+                                            <p className="text-sm text-gray-600">Total Value Creation</p>
+                                        </div>
+                                        <div className="text-center">
+                                            <p className="text-3xl font-bold text-purple-600">584%</p>
+                                            <p className="text-sm text-gray-600">Return on Investment</p>
+                                        </div>
+                                        <div className="text-center">
+                                            <p className="text-3xl font-bold text-yellow-600">24 months</p>
+                                            <p className="text-sm text-gray-600">Full Implementation</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Footer */}
+                    <div className="bg-gray-800 text-white mt-12">
+                        <div className="max-w-7xl mx-auto px-4 py-8">
+                            <div className="text-center">
+                                <h3 className="text-xl font-bold mb-2">Churches United Sustainability Initiative</h3>
+                                <p className="text-gray-300 mb-4">Transforming Crisis into Sustainable Community Impact</p>
+                                <div className="flex justify-center space-x-8 text-sm">
+                                    <div>
+                                        <span className="text-gray-400">Developed by:</span>
+                                        <span className="font-semibold ml-1">Timothy Spurlin</span>
+                                    </div>
+                                    <div>
+                                        <span className="text-gray-400">Contact:</span>
+                                        <span className="font-semibold ml-1">tim.spurlin@saphyresolutions.com</span>
+                                    </div>
+                                    <div>
+                                        <span className="text-gray-400">Last Updated:</span>
+                                        <span className="font-semibold ml-1">December 2024</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<ChurchesUnitedImpactAnalysis />, document.getElementById('root'));
+    </script>
+</body>
+</html>
