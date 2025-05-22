@@ -74,7 +74,7 @@ The repository is structured to serve multiple stakeholders, including Churches 
 
 ![Trinity Trikes Logo](assets/images/trinity-trikes-logo.png)
 
-![Trinity Trikes Logo](assets/images/trinity-trikes-logo.png) ![Trinity Trikes Logo](assets/images/trinity-trikes-logo.png)
+![Trinity Trikes Logo](assets/images/truck4wheel.png) ![Trinity Trikes Logo](assets/images/truck4wheel.png)
 
 Trinity Trikes represents a revolutionary approach to addressing transportation barriers for residents of Churches United, combining practical mobility solutions with skill development, economic opportunity, and community integration. This program provides weather-protected electric-assist trikes to residents who are actively seeking employment or currently employed, creating independence while building valuable skills and assets.
 
