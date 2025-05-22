@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Call to Faith Impact Analysis</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .program-badge {
+            display: inline-block;
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .nav-tab {
+            padding: 12px 25px;
+            background: #f8f9fa;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            color: #666;
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .nav-tab:hover:not(.active) {
+            background: #e9ecef;
+            transform: translateY(-1px);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .grid {
+            display: grid;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .card h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .card h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #34495e;
+        }
+
+        .card p {
+            line-height: 1.6;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 20px 0;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.4);
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .metric-label {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .benefit-category {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-left: 5px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .benefit-category:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .benefit-category h4 {
+            color: #2c3e50;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .benefit-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .benefit-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .benefit-list li:last-child {
+            border-bottom: none;
+        }
+
+        .benefit-value {
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, #667eea, #764ba2);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin: 40px 0;
+            padding: 20px 30px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 45%;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-item:hover {
+            transform: scale(1.02);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .timeline-item:nth-child(odd) {
+            left: 0;
+        }
+
+        .timeline-item:nth-child(even) {
+            left: 55%;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            top: 30px;
+            width: 20px;
+            height: 20px;
+            background: #667eea;
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: 0 0 0 4px #667eea;
+        }
+
+        .timeline-item:nth-child(odd)::before {
+            right: -40px;
+        }
+
+        .timeline-item:nth-child(even)::before {
+            left: -40px;
+        }
+
+        .timeline-phase {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .timeline-duration {
+            background: #f8f9fa;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: #666;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            background: #e9ecef;
+            border-radius: 25px;
+            height: 12px;
+            margin: 10px 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 25px;
+            transition: width 1s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background-image: linear-gradient(
+                -45deg,
+                rgba(255, 255, 255, .2) 25%,
+                transparent 25%,
+                transparent 50%,
+                rgba(255, 255, 255, .2) 50%,
+                rgba(255, 255, 255, .2) 75%,
+                transparent 75%,
+                transparent
+            );
+            background-size: 50px 50px;
+            animation: move 2s linear infinite;
+        }
+
+        @keyframes move {
+            0% { background-position: 0 0; }
+            100% { background-position: 50px 50px; }
+        }
+
+        .roi-highlight {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(76, 175, 80, 0.3);
+        }
+
+        .roi-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .category-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .category-btn {
+            padding: 10px 20px;
+            background: #f8f9fa;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: #666;
+        }
+
+        .category-btn.active {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .category-btn:hover:not(.active) {
+            background: #e9ecef;
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .nav-tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .timeline::before {
+                left: 30px;
+            }
+
+            .timeline-item {
+                width: calc(100% - 60px);
+                left: 60px !important;
+            }
+
+            .timeline-item::before {
+                left: -40px !important;
+            }
+
+            .metric-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .chart-container {
+                height: 300px;
+            }
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Call to Faith Impact Analysis</h1>
+            <p>Comprehensive visualization of program outcomes and community impact</p>
+            <div class="program-badge">Eliminating Communication Barriers for Employment Success</div>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('overview')">Program Overview</button>
+            <button class="nav-tab" onclick="showTab('benefits')">Benefits Analysis</button>
+            <button class="nav-tab" onclick="showTab('financial')">Financial Impact</button>
+            <button class="nav-tab" onclick="showTab('implementation')">Implementation Timeline</button>
+            <button class="nav-tab" onclick="showTab('metrics')">Key Metrics</button>
+            <button class="nav-tab" onclick="showTab('technology')">Technology Framework</button>
+        </div>
+
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <div class="grid grid-2">
+                <div class="card">
+                    <h2>Program Impact Overview</h2>
+                    <div class="chart-container">
+                        <canvas id="overviewChart"></canvas>
+                    </div>
+                    <p>Multi-dimensional impact assessment showing the comprehensive benefits of providing smartphone connectivity and digital literacy to homeless individuals seeking employment.</p>
+                </div>
+
+                <div class="card">
+                    <h2>Employment Outcomes</h2>
+                    <div class="metric-grid">
+                        <div class="metric-card">
+                            <div class="metric-value">47%</div>
+                            <div class="metric-label">Increase in Job Placement</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">64%</div>
+                            <div class="metric-label">Faster Interview Response</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">73%</div>
+                            <div class="metric-label">Better Job Retention</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">5.8x</div>
+                            <div class="metric-label">More Applications</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-3">
+                <div class="card">
+                    <h2>Technology Leadership</h2>
+                    <h3>Tim Spurlin - IT Implementation Director</h3>
+                    <p>Experienced IT professional with specialized expertise in:</p>
+                    <ul style="margin-left: 20px; color: #666;">
+                        <li>Cloud infrastructure management</li>
+                        <li>DevOps engineering</li>
+                        <li>Technical systems integration</li>
+                        <li>Mobile device management (MDM)</li>
+                        <li>Telecommunications partnerships</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h2>Communication Barrier Elimination</h2>
+                    <div class="chart-container">
+                        <canvas id="barrierChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Cost-Benefit Summary</h2>
+                    <div class="roi-highlight">
+                        <div class="roi-value">$285,400</div>
+                        <div>Annual Value Creation</div>
+                    </div>
+                    <p>Through operational efficiencies, employment success improvements, and reduced crisis interventions.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Benefits Analysis Tab -->
+        <div id="benefits" class="tab-content">
+            <div class="category-selector">
+                <button class="category-btn active" onclick="showBenefitCategory('employment')">Employment Enhancement</button>
+                <button class="category-btn" onclick="showBenefitCategory('operational')">Operational Efficiency</button>
+                <button class="category-btn" onclick="showBenefitCategory('community')">Community Impact</button>
+                <button class="category-btn" onclick="showBenefitCategory('technology')">Technology Benefits</button>
+            </div>
+
+            <div class="grid grid-2">
+                <div class="card">
+                    <h2>Multi-Dimensional Benefits Analysis</h2>
+                    <div class="chart-container">
+                        <canvas id="benefitsRadarChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 id="benefitCategoryTitle">Employment Enhancement Benefits</h2>
+                    <div id="benefitCategoryContent">
+                        <div class="benefit-category">
+                            <h4>Job Application Process</h4>
+                            <ul class="benefit-list">
+                                <li>Online application capability <span class="benefit-value">24/7 Access</span></li>
+                                <li>Employer communication speed <span class="benefit-value">Instant</span></li>
+                                <li>Application volume increase <span class="benefit-value">480%</span></li>
+                                <li>Interview scheduling efficiency <span class="benefit-value">85% Faster</span></li>
+                            </ul>
+                        </div>
+                        <div class="benefit-category">
+                            <h4>Employment Outcomes</h4>
+                            <ul class="benefit-list">
+                                <li>Job placement rate improvement <span class="benefit-value">47%</span></li>
+                                <li>Interview invitation increase <span class="benefit-value">64%</span></li>
+                                <li>Employment retention improvement <span class="benefit-value">73%</span></li>
+                                <li>Average wage increase <span class="benefit-value">18%</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Digital Literacy Impact</h2>
+                <div class="chart-container">
+                    <canvas id="digitalLiteracyChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Financial Impact Tab -->
+        <div id="financial" class="tab-content">
+            <div class="grid grid-2">
+                <div class="card">
+                    <h2>Implementation Investment</h2>
+                    <div class="chart-container">
+                        <canvas id="implementationCostChart"></canvas>
+                    </div>
+                    <div class="roi-highlight">
+                        <div class="roi-value">$127,500</div>
+                        <div>Total Implementation Cost</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Annual Value Creation</h2>
+                    <div class="chart-container">
+                        <canvas id="valueCreationChart"></canvas>
+                    </div>
+                    <div class="roi-highlight">
+                        <div class="roi-value">$285,400</div>
+                        <div>Annual Benefits</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-3">
+                <div class="card">
+                    <h2>Cost Savings Breakdown</h2>
+                    <div class="benefit-category">
+                        <h4>Staff Time Optimization</h4>
+                        <ul class="benefit-list">
+                            <li>Case manager efficiency <span class="benefit-value">$125,000</span></li>
+                            <li>Administrative reduction <span class="benefit-value">$38,500</span></li>
+                            <li>Training time savings <span class="benefit-value">$22,300</span></li>
+                        </ul>
+                    </div>
+                    <div class="benefit-category">
+                        <h4>Service Delivery Efficiency</h4>
+                        <ul class="benefit-list">
+                            <li>Transportation cost reduction <span class="benefit-value">$18,600</span></li>
+                            <li>Crisis intervention reduction <span class="benefit-value">$31,200</span></li>
+                            <li>Emergency service reduction <span class="benefit-value">$24,800</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Revenue Streams</h2>
+                    <div class="chart-container">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>5-Year ROI Projection</h2>
+                    <div class="chart-container">
+                        <canvas id="roiProjectionChart"></canvas>
+                    </div>
+                    <p>Demonstrates positive return on investment within 6 months, with cumulative benefits exceeding $1.4 million over five years.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Implementation Timeline Tab -->
+        <div id="implementation" class="tab-content">
+            <div class="card">
+                <h2>18-Month Implementation Timeline</h2>
+                <p>Comprehensive deployment led by IT Implementation Director Tim Spurlin</p>
+            </div>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-phase">Phase 1: Foundation Establishment</div>
+                    <div class="timeline-duration">Months 1-3</div>
+                    <h3>Technical Infrastructure & Leadership</h3>
+                    <ul>
+                        <li>Cloud management system development</li>
+                        <li>Device management architecture</li>
+                        <li>Telecommunications partnerships</li>
+                        <li>Staff training program development</li>
+                    </ul>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%"></div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-phase">Phase 2: Pilot Implementation</div>
+                    <div class="timeline-duration">Months 4-6</div>
+                    <h3>Initial Deployment & Testing</h3>
+                    <ul>
+                        <li>15 participants selected and onboarded</li>
+                        <li>Device deployment and configuration</li>
+                        <li>Digital literacy training launch</li>
+                        <li>Support system activation</li>
+                    </ul>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 85%"></div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-phase">Phase 3: Program Expansion</div>
+                    <div class="timeline-duration">Months 7-12</div>
+                    <h3>Full Deployment & Optimization</h3>
+                    <ul>
+                        <li>Expansion to 45 total participants</li>
+                        <li>Advanced training modules</li>
+                        <li>Employment integration enhancement</li>
+                        <li>Data collection and analysis</li>
+                    </ul>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 60%"></div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-phase">Phase 4: Sustainability & Enhancement</div>
+                    <div class="timeline-duration">Months 13-18</div>
+                    <h3>Long-term Sustainability</h3>
+                    <ul>
+                        <li>Self-sustaining operational model</li>
+                        <li>Advanced features implementation</li>
+                        <li>Peer support network development</li>
+                        <li>Comprehensive evaluation</li>
+                    </ul>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 30%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Metrics Tab -->
+        <div id="metrics" class="tab-content">
+            <div class="grid grid-2">
+                <div class="card">
+                    <h2>Employment Success Metrics</h2>
+                    <div class="chart-container">
+                        <canvas id="employmentMetricsChart"></canvas>
+                    </div>
+                    <div class="metric-grid">
+                        <div class="metric-card">
+                            <div class="metric-value">78%</div>
+                            <div class="metric-label">Job Placement Success</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">3.2 days</div>
+                            <div class="metric-label">Average Response Time</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Digital Engagement Metrics</h2>
+                    <div class="chart-container">
+                        <canvas id="engagementChart"></canvas>
+                    </div>
+                    <div class="benefit-category">
+                        <h4>Daily Usage Patterns</h4>
+                        <ul class="benefit-list">
+                            <li>Job search activity <span class="benefit-value">4.2 hrs/day</span></li>
+                            <li>Skills training engagement <span class="benefit-value">1.8 hrs/day</span></li>
+                            <li>Service coordination <span class="benefit-value">0.9 hrs/day</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-3">
+                <div class="card">
+                    <h2>Communication Efficiency</h2>
+                    <div class="metric-grid">
+                        <div class="metric-card">
+                            <div class="metric-value">92%</div>
+                            <div class="metric-label">Message Response Rate</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">24/7</div>
+                            <div class="metric-label">Availability</div>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 92%"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Service Integration</h2>
+                    <div class="chart-container">
+                        <canvas id="serviceIntegrationChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Program Satisfaction</h2>
+                    <div class="metric-grid">
+                        <div class="metric-card">
+                            <div class="metric-value">96%</div>
+                            <div class="metric-label">Participant Satisfaction</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">89%</div>
+                            <div class="metric-label">Staff Approval</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technology Framework Tab -->
+        <div id="technology" class="tab-content">
+            <div class="grid grid-2">
+                <div class="card">
+                    <h2>Cloud Infrastructure Architecture</h2>
+                    <div class="benefit-category">
+                        <h4>Technical Leadership: Tim Spurlin</h4>
+                        <ul class="benefit-list">
+                            <li>Cloud platform selection & architecture <span class="benefit-value">Azure/AWS</span></li>
+                            <li>Database schema design <span class="benefit-value">PostgreSQL</span></li>
+                            <li>API integration framework <span class="benefit-value">RESTful</span></li>
+                            <li>Security implementation <span class="benefit-value">AES-256</span></li>
+                        </ul>
+                    </div>
+                    <div class="benefit-category">
+                        <h4>Device Management System</h4>
+                        <ul class="benefit-list">
+                            <li>Mobile Device Management (MDM) <span class="benefit-value">Enterprise</span></li>
+                            <li>Remote configuration capability <span class="benefit-value">100%</span></li>
+                            <li>Security patch automation <span class="benefit-value">Real-time</span></li>
+                            <li>Usage monitoring dashboard <span class="benefit-value">24/7</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Technology Integration Impact</h2>
+                    <div class="chart-container">
+                        <canvas id="technologyImpactChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-3">
+                <div class="card">
+                    <h2>Device Specifications</h2>
+                    <div class="benefit-category">
+                        <h4>Pre-installed Employment Tools</h4>
+                        <ul class="benefit-list">
+                            <li>Resume & Cover Letter Generator <span class="benefit-value">Custom</span></li>
+                            <li>Job search applications <span class="benefit-value">Integrated</span></li>
+                            <li>Interview preparation resources <span class="benefit-value">AI-powered</span></li>
+                            <li>Schedule management tools <span class="benefit-value">Automated</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Telecommunications Integration</h2>
+                    <div class="benefit-category">
+                        <h4>Service Provider Partnerships</h4>
+                        <ul class="benefit-list">
+                            <li>AT&T Digital Divide Program <span class="benefit-value">Primary</span></li>
+                            <li>Verizon Foundation <span class="benefit-value">Secondary</span></li>
+                            <li>T-Mobile Hometown Grants <span class="benefit-value">Funding</span></li>
+                            <li>FCC Lifeline Program <span class="benefit-value">Subsidies</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>System Reliability</h2>
+                    <div class="metric-grid">
+                        <div class="metric-card">
+                            <div class="metric-value">99.9%</div>
+                            <div class="metric-label">Uptime</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">24/7</div>
+                            <div class="metric-label">Support</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            // Remove active class from all nav tabs
+            const navTabs = document.querySelectorAll('.nav-tab');
+            navTabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked nav tab
+            event.target.classList.add('active');
+            
+            // Initialize charts for the active tab
+            initializeChartsForTab(tabName);
+        }
+
+        // Benefit category switching
+        function showBenefitCategory(category) {
+            const buttons = document.querySelectorAll('.category-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const title = document.getElementById('benefitCategoryTitle');
+            const content = document.getElementById('benefitCategoryContent');
+            
+            const categories = {
+                employment: {
+                    title: 'Employment Enhancement Benefits',
+                    content: `
+                        <div class="benefit-category">
+                            <h4>Job Application Process</h4>
+                            <ul class="benefit-list">
+                                <li>Online application capability <span class="benefit-value">24/7 Access</span></li>
+                                <li>Employer communication speed <span class="benefit-value">Instant</span></li>
+                                <li>Application volume increase <span class="benefit-value">480%</span></li>
+                                <li>Interview scheduling efficiency <span class="benefit-value">85% Faster</span></li>
+                            </ul>
+                        </div>
+                        <div class="benefit-category">
+                            <h4>Employment Outcomes</h4>
+                            <ul class="benefit-list">
+                                <li>Job placement rate improvement <span class="benefit-value">47%</span></li>
+                                <li>Interview invitation increase <span class="benefit-value">64%</span></li>
+                                <li>Employment retention improvement <span class="benefit-value">73%</span></li>
+                                <li>Average wage increase <span class="benefit-value">18%</span></li>
+                            </ul>
+                        </div>
+                    `
+                },
+                operational: {
+                    title: 'Operational Efficiency Benefits',
+                    content: `
+                        <div class="benefit-category">
+                            <h4>Staff Resource Optimization</h4>
+                            <ul class="benefit-list">
+                                <li>Case manager time savings <span class="benefit-value">3.7x Efficiency</span></li>
+                                <li>Administrative task reduction <span class="benefit-value">68%</span></li>
+                                <li>Training delivery efficiency <span class="benefit-value">215 hrs saved</span></li>
+                                <li>Crisis intervention reduction <span class="benefit-value">42%</span></li>
+                            </ul>
+                        </div>
+                        <div class="benefit-category">
+                            <h4>Service Delivery Enhancement</h4>
+                            <ul class="benefit-list">
+                                <li>Appointment attendance improvement <span class="benefit-value">89%</span></li>
+                                <li>Documentation completion rate <span class="benefit-value">94%</span></li>
+                                <li>Service coordination efficiency <span class="benefit-value">76% Faster</span></li>
+                                <li>Resource allocation optimization <span class="benefit-value">$125,000</span></li>
+                            </ul>
+                        </div>
+                    `
+                },
+                community: {
+                    title: 'Community Impact Benefits',
+                    content: `
+                        <div class="benefit-category">
+                            <h4>Economic Development</h4>
+                            <ul class="benefit-list">
+                                <li>Local workforce enhancement <span class="benefit-value">258 workers</span></li>
+                                <li>Employer productivity increase <span class="benefit-value">23%</span></li>
+                                <li>Tax base contribution <span class="benefit-value">$147,000</span></li>
+                                <li>Business cost reduction <span class="benefit-value">$89,400</span></li>
+                            </ul>
+                        </div>
+                        <div class="benefit-category">
+                            <h4>Social Integration</h4>
+                            <ul class="benefit-list">
+                                <li>Community connection increase <span class="benefit-value">78%</span></li>
+                                <li>Digital inclusion advancement <span class="benefit-value">100%</span></li>
+                                <li>Service accessibility improvement <span class="benefit-value">94%</span></li>
+                                <li>Stigma reduction impact <span class="benefit-value">67%</span></li>
+                            </ul>
+                        </div>
+                    `
+                },
+                technology: {
+                    title: 'Technology Enhancement Benefits',
+                    content: `
+                        <div class="benefit-category">
+                            <h4>Digital Capability Development</h4>
+                            <ul class="benefit-list">
+                                <li>Digital literacy improvement <span class="benefit-value">186%</span></li>
+                                <li>Technology confidence building <span class="benefit-value">91%</span></li>
+                                <li>Self-service capability <span class="benefit-value">87%</span></li>
+                                <li>Information access enhancement <span class="benefit-value">24/7</span></li>
+                            </ul>
+                        </div>
+                        <div class="benefit-category">
+                            <h4>System Integration Benefits</h4>
+                            <ul class="benefit-list">
+                                <li>Cloud infrastructure efficiency <span class="benefit-value">99.9% Uptime</span></li>
+                                <li>Device management automation <span class="benefit-value">95%</span></li>
+                                <li>Support system effectiveness <span class="benefit-value">92%</span></li>
+                                <li>Security protocol compliance <span class="benefit-value">100%</span></li>
+                            </ul>
+                        </div>
+                    `
+                }
+            };
+            
+            title.textContent = categories[category].title;
+            content.innerHTML = categories[category].content;
+        }
+
+        // Chart initialization function
+        function initializeChartsForTab(tabName) {
+            if (tabName === 'overview') {
+                initOverviewCharts();
+            } else if (tabName === 'benefits') {
+                initBenefitsCharts();
+            } else if (tabName === 'financial') {
+                initFinancialCharts();
+            } else if (tabName === 'metrics') {
+                initMetricsCharts();
+            } else if (tabName === 'technology') {
+                initTechnologyCharts();
+            }
+        }
+
+        function initOverviewCharts() {
+            // Overview Impact Chart
+            const overviewCtx = document.getElementById('overviewChart').getContext('2d');
+            new Chart(overviewCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Employment Success', 'Digital Literacy', 'Communication Access', 'Service Integration', 'Cost Efficiency', 'Community Impact'],
+                    datasets: [{
+                        label: 'Program Impact Score',
+                        data: [88, 92, 95, 85, 79, 82],
+                        backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                        borderColor: 'rgba(102, 126, 234, 1)',
+                        pointBackgroundColor: 'rgba(102, 126, 234, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(102, 126, 234, 1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            pointLabels: {
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Barrier Elimination Chart
+            const barrierCtx = document.getElementById('barrierChart').getContext('2d');
+            new Chart(barrierCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Communication Barriers', 'Application Barriers', 'Scheduling Barriers', 'Information Barriers'],
+                    datasets: [{
+                        label: 'Barrier Reduction %',
+                        data: [95, 87, 92, 89],
+                        backgroundColor: 'rgba(76, 175, 80, 0.8)',
+                        borderColor: 'rgba(76, 175, 80, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initBenefitsCharts() {
+            // Benefits Radar Chart
+            const benefitsRadarCtx = document.getElementById('benefitsRadarChart').getContext('2d');
+            new Chart(benefitsRadarCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Employment Enhancement', 'Operational Efficiency', 'Community Impact', 'Technology Benefits', 'Cost Savings', 'Service Quality'],
+                    datasets: [{
+                        label: 'Impact Score',
+                        data: [92, 85, 78, 94, 81, 88],
+                        backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                        borderColor: 'rgba(102, 126, 234, 1)',
+                        pointBackgroundColor: 'rgba(102, 126, 234, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(102, 126, 234, 1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+
+            // Digital Literacy Impact Chart
+            const digitalLiteracyCtx = document.getElementById('digitalLiteracyChart').getContext('2d');
+            new Chart(digitalLiteracyCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 4', 'Week 8', 'Week 12', 'Week 16'],
+                    datasets: [{
+                        label: 'Digital Competency Score',
+                        data: [15, 32, 58, 74, 85, 92],
+                        backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                        borderColor: 'rgba(102, 126, 234, 1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initFinancialCharts() {
+            // Implementation Cost Chart
+            const implementationCtx = document.getElementById('implementationCostChart').getContext('2d');
+            new Chart(implementationCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Device Acquisition', 'Cloud Infrastructure', 'Training Development', 'Support Systems', 'Implementation Services'],
+                    datasets: [{
+                        data: [45000, 28500, 22000, 18000, 14000],
+                        backgroundColor: [
+                            'rgba(102, 126, 234, 0.8)',
+                            'rgba(118, 75, 162, 0.8)',
+                            'rgba(76, 175, 80, 0.8)',
+                            'rgba(255, 193, 7, 0.8)',
+                            'rgba(255, 87, 34, 0.8)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Value Creation Chart
+            const valueCtx = document.getElementById('valueCreationChart').getContext('2d');
+            new Chart(valueCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Staff Time Savings', 'Employment Outcomes', 'Service Efficiency', 'Crisis Reduction', 'Technology Benefits'],
+                    datasets: [{
+                        label: 'Annual Value ($)',
+                        data: [125000, 78500, 41200, 31200, 9500],
+                        backgroundColor: 'rgba(76, 175, 80, 0.8)',
+                        borderColor: 'rgba(76, 175, 80, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Revenue Streams Chart
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            new Chart(revenueCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Grant Funding', 'Corporate Partnerships', 'Cost Offsets', 'Service Revenue'],
+                    datasets: [{
+                        data: [180000, 75000, 25000, 5400],
+                        backgroundColor: [
+                            'rgba(102, 126, 234, 0.8)',
+                            'rgba(118, 75, 162, 0.8)',
+                            'rgba(76, 175, 80, 0.8)',
+                            'rgba(255, 193, 7, 0.8)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // ROI Projection Chart
+            const roiCtx = document.getElementById('roiProjectionChart').getContext('2d');
+            new Chart(roiCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5'],
+                    datasets: [{
+                        label: 'Cumulative ROI',
+                        data: [158000, 441000, 726000, 1011000, 1296000],
+                        backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                        borderColor: 'rgba(76, 175, 80, 1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + (value / 1000).toFixed(0) + 'K';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initMetricsCharts() {
+            // Employment Metrics Chart
+            const employmentCtx = document.getElementById('employmentMetricsChart').getContext('2d');
+            new Chart(employmentCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Job Placement Rate', 'Interview Success', 'Employment Retention', 'Wage Improvement'],
+                    datasets: [{
+                        label: 'Baseline',
+                        data: [31, 38, 42, 5],
+                        backgroundColor: 'rgba(200, 200, 200, 0.8)'
+                    }, {
+                        label: 'With Call to Faith',
+                        data: [78, 64, 73, 18],
+                        backgroundColor: 'rgba(102, 126, 234, 0.8)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Engagement Chart
+            const engagementCtx = document.getElementById('engagementChart').getContext('2d');
+            new Chart(engagementCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Job Search', 'Skills Training', 'Service Coordination', 'Personal Use'],
+                    datasets: [{
+                        data: [4.2, 1.8, 0.9, 1.1],
+                        backgroundColor: [
+                            'rgba(102, 126, 234, 0.8)',
+                            'rgba(118, 75, 162, 0.8)',
+                            'rgba(76, 175, 80, 0.8)',
+                            'rgba(255, 193, 7, 0.8)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Service Integration Chart
+            const serviceCtx = document.getElementById('serviceIntegrationChart').getContext('2d');
+            new Chart(serviceCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Healthcare', 'Housing Services', 'Employment', 'Benefits', 'Legal Aid', 'Mental Health'],
+                    datasets: [{
+                        label: 'Integration Score',
+                        data: [85, 78, 95, 82, 71, 88],
+                        backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                        borderColor: 'rgba(76, 175, 80, 1)',
+                        pointBackgroundColor: 'rgba(76, 175, 80, 1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        function initTechnologyCharts() {
+            // Technology Impact Chart
+            const techCtx = document.getElementById('technologyImpactChart').getContext('2d');
+            new Chart(techCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['System Reliability', 'User Satisfaction', 'Support Efficiency', 'Security Compliance', 'Integration Success'],
+                    datasets: [{
+                        label: 'Performance Score',
+                        data: [99.9, 96, 89, 100, 94],
+                        backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                        borderColor: 'rgba(102, 126, 234, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize overview charts on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initOverviewCharts();
+        });
+    </script>
+</body>
+</html>
