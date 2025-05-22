@@ -164,7 +164,7 @@ This approach eliminates traditional limitations where residents could only work
 
 [View Complete Call to Faith Documentation](https://tim-spurlin.github.io/churches-united-sustainability-initiative/programs/call-to-faith/)
 
-[View Call to Faith Economic Impact Analysis](https://tim-spurlin.github.io/churches-united-sustainability-initiative/visualizations/call-to-faith-impact.html)
+[View Call to Faith Economic Impact Analysis](https://tim-spurlin.github.io/churches-united-sustainability-initiative/programs/call-to-faith/impact-analysis.html)
 
 ### Resume and Cover Letter Generator
 
